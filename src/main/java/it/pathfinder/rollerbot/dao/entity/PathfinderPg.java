@@ -25,4 +25,10 @@ public class PathfinderPg implements Serializable {
     @JoinColumn(name = "telegram_user_id")
     private TelegramUser telegramUser;
 
+    public PathfinderPg(PathfinderPg pathfinderPg)
+    {
+        id = pathfinderPg.id;
+        name = pathfinderPg.getName();
+    }
+
 }

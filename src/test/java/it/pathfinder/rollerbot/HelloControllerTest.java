@@ -37,9 +37,9 @@ public class HelloControllerTest {
     @Test
     public void randomize()
     {
-        String diceFormula = "2d10";
+        String diceFormula = "2x2d10";
         ParserService parserService = new ParserService();
-        parserService.parseFormula(diceFormula, "internalTest");
+        System.out.println(parserService.parseFormula(diceFormula, "internalTest"));
     }
 
     @Ignore

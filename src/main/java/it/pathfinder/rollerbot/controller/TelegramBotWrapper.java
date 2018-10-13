@@ -1,27 +1,22 @@
 package it.pathfinder.rollerbot.controller;
 
-import it.pathfinder.rollerbot.dispatcher.DispatcherService;
 import it.pathfinder.rollerbot.dispatcher.TelegramBot;
+import it.pathfinder.rollerbot.dispatcher.TelegramBotFallback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import javax.annotation.PostConstruct;
 
-@Controller
+@Component
 public class TelegramBotWrapper
 {
-
-    //@Value("${telegram.bot.token}")
-    private String token = "443957821:AAGLcIug5rtahehWyKgxU3uVDqMTUQ6MmYM";
-
     @Autowired
-    private DispatcherService dispatcherService;
-
     private TelegramBot telegramBot;
 
     private static Logger logger = LogManager.getLogger();
@@ -29,21 +24,24 @@ public class TelegramBotWrapper
     @PostConstruct
     public void init(){
         ApiContextInitializer.init();
-
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-
-        try {
-            telegramBot = new TelegramBot(token, dispatcherService);
-            botsApi.registerBot(telegramBot);
-        } catch (TelegramApiException e) {
-            logger.error("Ther is already one telegram bot server on!");
-        }
+        logger.info("Trying to hook to the bot!");
+        if (!(registerBot(telegramBot) || registerBot(new TelegramBotFallback(telegramBot.getBotToken(), telegramBot))))
+            logger.error("Hook to bot failed");
+        else
+            logger.info("Hooked successful");
     }
 
-    public void sendBotMessage(Long chatId, String message){
-        if (chatId != null) {
-            telegramBot.sendNotification(chatId, message);
+    private boolean registerBot(TelegramLongPollingBot telegramLongPollingBot)
+    {
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+        boolean hooked = false;
+        try {
+            botsApi.registerBot(telegramLongPollingBot);
+            hooked = true;
+        } catch (TelegramApiRequestException e) {
+            logger.error(e.getMessage());
         }
+        return hooked;
     }
 
 }
