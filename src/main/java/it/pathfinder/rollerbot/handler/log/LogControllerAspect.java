@@ -64,7 +64,7 @@ public class LogControllerAspect
      * Punto di intervento che ci permette di stampare le eccezioni che avvengono a livello di dispatcher.
      * Non deve stampare nel log né le richieste né le risposte
      */
-    @Pointcut("execution(* it.pathfinder.rollerbot.dispatcher.DispatcherService.* (..))")
+    @Pointcut("execution(* it.pathfinder.rollerbot.webflux.router.*.* (..))")
     private void logDispatcherPointcut()
     {
         // Non deve fare nulla, serve solo come punto di intervento per i metodi del package dispatcher
