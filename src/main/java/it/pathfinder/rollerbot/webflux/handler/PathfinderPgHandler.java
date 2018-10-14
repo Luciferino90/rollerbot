@@ -2,7 +2,7 @@ package it.pathfinder.rollerbot.webflux.handler;
 
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
-import it.pathfinder.rollerbot.response.entity.PathfinderPgDetail;
+import dto.generic.entity.PathfinderPgDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -14,9 +14,9 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
 @Component
-public class PathfinderPgHandler extends BaseHandler {
+public class PathfinderPgHandler extends BasicHandler {
 
-    private Logger logger = LoggerFactory.getLogger(PathfinderPgHandler.class);
+    private Logger logger = LoggerFactory.getLogger(BasicHandler.class);
 
     public Mono<ServerResponse> hello(ServerRequest request) {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -31,14 +31,14 @@ public class PathfinderPgHandler extends BaseHandler {
         TelegramUser telegramUser = telegramUserService.findOrRegister(tgUser);
         logger.info("@{}: {}", tgUser.getUserName(), characterName);
         PathfinderPg pathfinderPg = pathfinderPgService.create(characterName, telegramUser);
-        return response(Mono.just(new PathfinderPgDetail(pathfinderPg)));
+        return response(new PathfinderPgDetail(pathfinderPg));
     }
 
     public Mono<ServerResponse> getCharacter(ServerRequest request)
     {
         Long oid = Long.parseLong(request.pathVariable("oid"));
         PathfinderPg pathfinderPg = pathfinderPgService.findByOid(oid);
-        return response(Mono.just(new PathfinderPgDetail(pathfinderPg)));
+        return response(new PathfinderPgDetail(pathfinderPg));
     }
 
 }

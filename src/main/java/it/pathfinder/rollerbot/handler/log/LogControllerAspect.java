@@ -101,31 +101,6 @@ public class LogControllerAspect
     }
 
     /**
-     * Attivato al ritorno dell'esecuzione del metodo, con corrispondente valore
-     * ritornato
-     *
-     * @param joinPoint
-     *            Punto di intervento
-     * @param retVal
-     *            valore riportato
-     */
-    @AfterReturning(pointcut = "logControllerPointcut(requestMapping)", returning = "retVal")
-    public void doAfterReturn(JoinPoint joinPoint, RequestMapping requestMapping, Object retVal)
-    {
-        try {
-            logJpSign(requestMapping, joinPoint, ENDMETHOD);
-            String jsName = joinPoint.getSignature().getName();
-            if (retVal != null) {
-                logger.info(RETURNVALUE, threadId.get(), jsName, retVal);
-            } else {
-                logger.info(NORETURNVALUE, threadId.get(), jsName);
-            }
-        } finally {
-            threadId.remove();
-        }
-    }
-
-    /**
      * Intercettato in caso di eccezioni, le eccezioni si devono sollevare dal dispatcher
      * e devono poter risalire. Quindi verrà triggerato solamente dal punto di intervento
      * che ascolta il package dispatcher, altrimenti duplichiamo tutti i log.

@@ -10,18 +10,18 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class GenericRouter {
+public class GenericRouter extends BasicRouter {
 
     @Bean
     public RouterFunction<ServerResponse> routeDiceRoller(GenericHandler genericHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/{expression}").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/{expression}").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller);
     }
 
     @Bean
     public RouterFunction<ServerResponse> routeHelloWorld(GenericHandler genericHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::helloWorld);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/hello").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::helloWorld);
     }
 
 }

@@ -9,7 +9,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import org.telegram.telegrambots.ApiContextInitializer;
 
 @EnableWebFlux
-@SpringBootApplication(scanBasePackages = "it.pathfinder.rollerbot")
+@SpringBootApplication
 @EnableJpaRepositories
 public class RollerBot {
 

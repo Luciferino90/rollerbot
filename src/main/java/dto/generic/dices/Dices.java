@@ -1,7 +1,8 @@
-package it.pathfinder.rollerbot.response.dices;
+package dto.generic.dices;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import it.pathfinder.rollerbot.response.Info;
+import dto.generic.GenericDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Dices implements Serializable, Info {
+@AllArgsConstructor
+public class Dices extends GenericDTO implements Serializable {
 
     @JsonIgnore
     private String username;

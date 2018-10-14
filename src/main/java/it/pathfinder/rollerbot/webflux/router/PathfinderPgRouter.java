@@ -10,18 +10,18 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class PathfinderPgRouter {
+public class PathfinderPgRouter extends BasicRouter {
 
     @Bean
     public RouterFunction<ServerResponse> routeGet(PathfinderPgHandler pathfinderPgHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/get").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::getCharacter);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/get").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::getCharacter);
     }
 
     @Bean
     public RouterFunction<ServerResponse> routeCreate(PathfinderPgHandler pathfinderPgHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/create").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::createCharacter);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/create").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::createCharacter);
     }
 
 }

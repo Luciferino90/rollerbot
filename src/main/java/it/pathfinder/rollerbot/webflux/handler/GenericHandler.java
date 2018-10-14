@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
 @Component
-public class GenericHandler extends BaseHandler {
+public class GenericHandler extends BasicHandler {
 
     private Logger logger = LoggerFactory.getLogger(GenericHandler.class);
 
@@ -18,7 +18,7 @@ public class GenericHandler extends BaseHandler {
         User tgUser = objectMapper.convertValue(request.queryParam("user"), User.class);
         String expression = request.pathVariable("expression");
         logger.info("@{}: {}", tgUser.getUserName(), expression);
-        return response(Mono.just(parserService.parseFormula(expression, tgUser.getUserName())));
+        return response(parserService.parseFormula(expression, tgUser.getUserName()));
     }
 
     public Mono<ServerResponse> helloWorld(ServerRequest request)

@@ -1,9 +1,11 @@
 package it.pathfinder.rollerbot.webflux.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.generic.DataDTO;
+import dto.generic.GenericDTO;
+import dto.response.generic.GenericResponse;
 import it.pathfinder.rollerbot.data.service.PathfinderPgService;
 import it.pathfinder.rollerbot.data.service.TelegramUserService;
-import it.pathfinder.rollerbot.response.Info;
 import it.pathfinder.rollerbot.service.ParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,7 +15,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Component
-public abstract class BaseHandler {
+public abstract class BasicHandler {
 
     @Autowired
     ParserService parserService;
@@ -27,11 +29,13 @@ public abstract class BaseHandler {
     @Autowired
     ObjectMapper objectMapper;
 
-    Mono<ServerResponse> response(Mono<Info> infoMono)
+    Mono<ServerResponse> response(GenericDTO data)
     {
+        GenericResponse response = new GenericResponse();
+        response.setData(data);
         return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(infoMono, Info.class));
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromPublisher(Mono.just(response), GenericResponse.class));
     }
 
     Mono<ServerResponse> response(String plainText)

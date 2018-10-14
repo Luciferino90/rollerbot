@@ -1,10 +1,10 @@
 package it.pathfinder.rollerbot.service;
 
+import dto.generic.GenericDTO;
 import it.pathfinder.rollerbot.custom.Formula;
 import it.pathfinder.rollerbot.custom.FormulaMul;
-import it.pathfinder.rollerbot.response.dices.Dices;
-import it.pathfinder.rollerbot.response.Info;
-import it.pathfinder.rollerbot.response.dices.SingleDiceResponse;
+import dto.generic.dices.Dices;
+import dto.generic.dices.SingleDiceResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -24,13 +24,13 @@ public class ParserService {
      * This will suck a lot.
      * @return
      */
-    public Info parseFormula(String formulaString, String username)
+    public GenericDTO parseFormula(String formulaString, String username)
     {
-        Dices multiResponse = new Dices(username);
+        Dices dicesResult = new Dices(username);
         FormulaMul formulaMul = manageMultiplier(formulaString);
         LongStream.rangeClosed(0L, formulaMul.getMultiplier() - 1)
-                .forEach(l -> multiResponse.addSingleDiceResponse(manageSingleFormula(formulaMul.getFormula())));
-        return multiResponse;
+                .forEach(l -> dicesResult.addSingleDiceResponse(manageSingleFormula(formulaMul.getFormula())));
+        return dicesResult;
     }
     //4d6
     /**

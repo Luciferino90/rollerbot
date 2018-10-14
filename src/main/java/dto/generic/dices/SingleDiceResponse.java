@@ -1,4 +1,4 @@
-package it.pathfinder.rollerbot.response.dices;
+package dto.generic.dices;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
