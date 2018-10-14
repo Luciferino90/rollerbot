@@ -62,7 +62,7 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         Message message = update.getMessage();
         TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom());
-        String queryParam = "?user="+telegramUser.getId();
+        String queryParam = "?user="+telegramUser.getTgId();
         try {
             String response = webClient.get()
                                     .uri(prepareUri(message.getText())+queryParam)
@@ -102,16 +102,16 @@ public class TelegramBot extends TelegramLongPollingBot
 
     private String prepareUri(String endPoint)
     {
+        /*String finalEndPoint = endPoint;
         Optional<Boolean> isApi = endpointsListener.getSupportedEndPoint()
                 .stream()
-                .map(endPoint1 -> configBean.getSpringWebservicesPath() + endPoint1)
-                .map(endPoint::startsWith)
+                .map(suppEndPoint -> suppEndPoint.startsWith(finalEndPoint.split(" ")[0]))
                 .findAny();
 
         if (isApi.isPresent() && isApi.get()){
-            endPoint = (configBean.getSpringWebservicesPath() + endPoint).replace("", "/");
-        }
-        return endPoint;
+            endPoint = (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
+        }*/
+        return (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
     }
 
 }
