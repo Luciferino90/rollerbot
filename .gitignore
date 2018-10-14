@@ -4,3 +4,7 @@ tarket/
 
 application.properties
 rollerbot.iml
+
+target/
+
+src/main/resources/application\.yml
