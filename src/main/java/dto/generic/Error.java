@@ -1,4 +1,4 @@
-package dto.generic.dices;
+package dto.generic;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SingleDiceResponse implements Serializable {
+public class Error extends GenericDTO implements Serializable {
 
-    String result;
-
-    String partialResult;
+    private String errorDetail;
 
 }

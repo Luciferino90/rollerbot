@@ -61,13 +61,13 @@ public class LogControllerAspect
     }
 
     /**
-     * Punto di intervento che ci permette di stampare le eccezioni che avvengono a livello di dispatcher.
+     * Punto di intervento che ci permette di stampare le eccezioni che avvengono a livello di telegram.
      * Non deve stampare nel log né le richieste né le risposte
      */
     @Pointcut("execution(* it.pathfinder.rollerbot.webflux.router.*.* (..))")
     private void logDispatcherPointcut()
     {
-        // Non deve fare nulla, serve solo come punto di intervento per i metodi del package dispatcher
+        // Non deve fare nulla, serve solo come punto di intervento per i metodi del package telegram
     }
 
     /**
@@ -101,9 +101,9 @@ public class LogControllerAspect
     }
 
     /**
-     * Intercettato in caso di eccezioni, le eccezioni si devono sollevare dal dispatcher
+     * Intercettato in caso di eccezioni, le eccezioni si devono sollevare dal telegram
      * e devono poter risalire. Quindi verrà triggerato solamente dal punto di intervento
-     * che ascolta il package dispatcher, altrimenti duplichiamo tutti i log.
+     * che ascolta il package telegram, altrimenti duplichiamo tutti i log.
      *
      * @param joinPoint
      *            Punto di intervento corrispondente

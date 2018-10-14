@@ -1,4 +1,4 @@
-package it.pathfinder.rollerbot.dispatcher;
+package it.pathfinder.rollerbot.telegram;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,7 +1,7 @@
 package it.pathfinder.rollerbot.controller;
 
-import it.pathfinder.rollerbot.dispatcher.TelegramBot;
-import it.pathfinder.rollerbot.dispatcher.TelegramBotFallback;
+import it.pathfinder.rollerbot.telegram.TelegramBot;
+import it.pathfinder.rollerbot.telegram.TelegramBotFallback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

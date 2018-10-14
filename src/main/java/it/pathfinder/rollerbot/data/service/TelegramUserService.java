@@ -31,11 +31,19 @@ public class TelegramUserService {
             return null;
     }
 
+    public TelegramUser findByTgOid(Long tgOid)
+    {
+        return telegramUserRepository.findTelegramUserByTgId(tgOid);
+    }
+
     public TelegramUser registerUser(User user)
     {
-        TelegramUser telegramUser = new TelegramUser();
-        telegramUser.setRegisterDate(new Date());
-        telegramUser.setTgId(user.getId().longValue());
+        TelegramUser telegramUser = telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId()));
+        if (telegramUser == null) {
+            telegramUser = new TelegramUser();
+            telegramUser.setRegisterDate(new Date());
+            telegramUser.setTgId(user.getId().longValue());
+        }
         telegramUser.setTgName(user.getFirstName());
         telegramUser.setTgSurname(user.getLastName());
         telegramUser.setTgUsername(user.getUserName());
