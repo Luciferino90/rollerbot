@@ -6,10 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import javax.annotation.PostConstruct;
 
@@ -23,25 +20,19 @@ public class TelegramBotWrapper
 
     @PostConstruct
     public void init(){
-        ApiContextInitializer.init();
-        logger.info("Trying to hook to the bot!");
-        if (!(registerBot(telegramBot) || registerBot(new TelegramBotFallback(telegramBot.getBotToken(), telegramBot))))
-            logger.error("Hook to bot failed");
-        else
-            logger.info("Hooked successful");
-    }
-
-    private boolean registerBot(TelegramLongPollingBot telegramLongPollingBot)
-    {
         TelegramBotsApi botsApi = new TelegramBotsApi();
-        boolean hooked = false;
         try {
-            botsApi.registerBot(telegramLongPollingBot);
-            hooked = true;
-        } catch (TelegramApiRequestException e) {
-            logger.error(e.getMessage());
+            botsApi.registerBot(telegramBot);
+            return;
+        } catch (Exception e) {
+            logger.error("Autowired hook failed {}", e.getMessage());
         }
-        return hooked;
-    }
 
+        try {
+            botsApi.registerBot(new TelegramBotFallback(telegramBot.getBotToken(), telegramBot));
+        } catch (Exception e) {
+            logger.error("Costruct hook failed {}", e.getMessage());
+        }
+
+    }
 }

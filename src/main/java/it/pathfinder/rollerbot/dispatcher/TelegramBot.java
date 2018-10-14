@@ -17,9 +17,6 @@ import javax.annotation.PostConstruct;
 public class TelegramBot extends TelegramLongPollingBot
 {
 
-    @Value("${spring.webservices.path}")
-    private String springWebservicesPath;
-
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
@@ -44,7 +41,7 @@ public class TelegramBot extends TelegramLongPollingBot
         try {
             execute(new SendMessage()
                     .setText(webClient.get()
-                            .uri(springWebservicesPath+"/"+update
+                            .uri(update
                                     .getMessage()
                                     .getText())
                             .exchange()

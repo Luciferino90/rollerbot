@@ -1,6 +1,6 @@
-package it.pathfinder.rollerbot.response.dao;
+package it.pathfinder.rollerbot.response.entity;
 
-import it.pathfinder.rollerbot.dao.entity.PathfinderPg;
+import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.response.Info;
 import lombok.Data;
 

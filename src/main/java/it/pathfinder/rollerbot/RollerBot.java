@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.reactive.config.EnableWebFlux;
+import org.telegram.telegrambots.ApiContextInitializer;
 
 @EnableWebFlux
 @SpringBootApplication(scanBasePackages = "it.pathfinder.rollerbot")
@@ -20,6 +21,7 @@ public class RollerBot {
 
     public static void main(String[] args)
     {
+        ApiContextInitializer.init();
         SpringApplication.run(RollerBot.class, args);
     }
 
