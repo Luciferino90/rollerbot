@@ -17,6 +17,13 @@ public class GenericResponse extends GenericDTO implements Serializable
 
     private static final long serialVersionUID = 20180515_1207L;
 
+    private String className;
+
     private GenericDTO data;
+
+    public GenericResponse(GenericDTO data)
+    {
+        this.data = data;
+    }
 
 }

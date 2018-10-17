@@ -8,9 +8,15 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force=true)
 public class Error extends GenericDTO implements Serializable {
 
+    private String className;
     private String errorDetail;
+
+    public Error(String errorDetail)
+    {
+        this.errorDetail = errorDetail;
+    }
 
 }

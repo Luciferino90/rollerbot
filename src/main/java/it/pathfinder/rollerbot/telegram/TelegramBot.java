@@ -1,14 +1,13 @@
 package it.pathfinder.rollerbot.telegram;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.response.generic.GenericResponse;
 import it.pathfinder.rollerbot.config.ConfigBean;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.service.TelegramUserService;
 import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -21,7 +20,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 
@@ -62,17 +60,16 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         Message message = update.getMessage();
         TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom());
-        String queryParam = "?user="+telegramUser.getTgId();
+        String queryParam = "?tgOid="+telegramUser.getTgId();
         try {
-            String response = webClient.get()
-                                    .uri(prepareUri(message.getText())+queryParam)
-                                    .exchange()
-                                    .block()
-                                    .bodyToMono(String.class)
-                                    .block();
-            JSONObject prettyResponse = new JSONObject(response).getJSONObject("data");
-            sendMessage(prettyResponse.toString(1), message.getMessageId(), message.getChatId());
-        } catch (JSONException e) {
+            GenericResponse response = webClient.get()
+                    .uri(prepareUri(message.getText()) + queryParam)
+                    .retrieve()
+                    .bodyToMono(GenericResponse.class)
+                    .block();
+            String prettyResponse = response.getData().toString();
+            sendMessage(prettyResponse, message.getMessageId(), message.getChatId());
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             sendMessage(e.getMessage(), message.getMessageId(), message.getChatId());
         }

@@ -17,6 +17,8 @@ public abstract class PagedResponse extends DataDTO implements Serializable
 	long number;
 	long size;
 
+	private String className;
+
 	public boolean isFirst(){
 		return isEmpty() || this.getNumber()==0;
 	}

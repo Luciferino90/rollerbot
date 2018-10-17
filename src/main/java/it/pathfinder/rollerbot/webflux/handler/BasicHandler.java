@@ -29,6 +29,11 @@ public abstract class BasicHandler {
     @Autowired
     ObjectMapper objectMapper;
 
+    Mono responseT(GenericDTO data)
+    {
+        return Mono.just(new GenericResponse(data));
+    }
+
     Mono<ServerResponse> response(GenericDTO data)
     {
         GenericResponse response = new GenericResponse();

@@ -8,11 +8,17 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force=true)
 public class SingleDiceResponse implements Serializable {
 
-    String result;
+    private String result;
+    private String partialResult;
+    private String username;
 
-    String partialResult;
+    @Override
+    public String toString()
+    {
+        return String.format("%s => [%s]: %s", username, partialResult, result);
+    }
 
 }

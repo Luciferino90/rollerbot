@@ -10,9 +10,11 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force=true)
 public class TelegramUserDetail extends GenericDTO implements Serializable {
 
     private TelegramUser telegramUser;
+
+    private String className;
 
 }
