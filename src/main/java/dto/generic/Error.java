@@ -19,4 +19,10 @@ public class Error extends GenericDTO implements Serializable {
         this.errorDetail = errorDetail;
     }
 
+    @Override
+    public String toString()
+    {
+        return errorDetail;
+    }
+
 }

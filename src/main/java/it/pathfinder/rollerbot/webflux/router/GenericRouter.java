@@ -15,13 +15,10 @@ public class GenericRouter extends BasicRouter {
     @Bean
     public RouterFunction<ServerResponse> routeDiceRoller(GenericHandler genericHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/{expression}").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller);
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> routeHelloWorld(GenericHandler genericHandler) {
-        return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/hello").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::helloWorld);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/{expression}")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/hello")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::helloWorld);
     }
 
 }

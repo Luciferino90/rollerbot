@@ -25,7 +25,7 @@ public class PathfinderPgHandler extends BasicHandler {
 
     public Mono<ServerResponse> createCharacter(ServerRequest request)
     {
-        TelegramUser tgUser = telegramUserService.findByTgOid(Long.parseLong(request.queryParam("user").orElse("")));
+        TelegramUser tgUser = telegramUserService.findByTgOid(Long.parseLong(request.queryParam("user").orElse(""))).orElse(null);
         if (tgUser == null)
             return response(new Error("Telegram user not registered"));
         String characterName = request.pathVariable("username");
@@ -36,7 +36,7 @@ public class PathfinderPgHandler extends BasicHandler {
 
     public Mono<ServerResponse> getCharacter(ServerRequest request)
     {
-        TelegramUser tgUser = telegramUserService.findByTgOid(Long.parseLong(request.queryParam("user").orElse("")));
+        TelegramUser tgUser = telegramUserService.findByTgOid(Long.parseLong(request.queryParam("user").orElse(""))).orElse(null);
         if (tgUser == null)
             return response(new Error("Telegram user not registered"));
         Long oid = Long.parseLong(request.pathVariable("oid"));

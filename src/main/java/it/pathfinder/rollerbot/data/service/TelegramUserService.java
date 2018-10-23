@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class TelegramUserService {
@@ -17,11 +18,11 @@ public class TelegramUserService {
 
     public TelegramUser findOrRegister(User user)
     {
-        TelegramUser telegramUser = findByUser(user);
-        return telegramUser != null ? telegramUser : registerUser(user);
+        Optional<TelegramUser> telegramUser = findByUser(user);
+        return telegramUser.orElse(registerUser(user));
     }
 
-    public TelegramUser findByUser(User user)
+    public Optional<TelegramUser> findByUser(User user)
     {
         if (user.getId() != null)
             return telegramUserRepository.findTelegramUserByTgId(user.getId().longValue());
@@ -31,22 +32,34 @@ public class TelegramUserService {
             return null;
     }
 
-    public TelegramUser findByTgOid(Long tgOid)
+    public Optional<TelegramUser> findByTgOid(Long tgOid)
     {
         return telegramUserRepository.findTelegramUserByTgId(tgOid);
     }
 
     public TelegramUser registerUser(User user)
     {
-        TelegramUser telegramUser = telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId()));
-        if (telegramUser == null) {
-            telegramUser = new TelegramUser();
-            telegramUser.setRegisterDate(new Date());
-            telegramUser.setTgId(user.getId().longValue());
-        }
+        TelegramUser telegramUser = telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId()))
+                .orElse(createNewUser(user));
+
         telegramUser.setTgName(user.getFirstName());
         telegramUser.setTgSurname(user.getLastName());
         telegramUser.setTgUsername(user.getUserName());
         return telegramUserRepository.save(telegramUser);
+    }
+
+    private TelegramUser createNewUser(User user)
+    {
+        TelegramUser telegramUser = new TelegramUser();
+        telegramUser.setRegisterDate(new Date());
+        telegramUser.setTgId(user.getId().longValue());
+        return telegramUser;
+    }
+
+    public TelegramUser createAnonUser()
+    {
+        TelegramUser telegramUser = new TelegramUser();
+        telegramUser.setTgUsername("anonymous");
+        return telegramUser;
     }
 }

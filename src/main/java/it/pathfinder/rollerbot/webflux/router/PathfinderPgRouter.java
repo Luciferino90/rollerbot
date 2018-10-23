@@ -15,13 +15,10 @@ public class PathfinderPgRouter extends BasicRouter {
     @Bean
     public RouterFunction<ServerResponse> routeGet(PathfinderPgHandler pathfinderPgHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/get/{oid}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::getCharacter);
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> routeCreate(PathfinderPgHandler pathfinderPgHandler) {
-        return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/create/{username}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::createCharacter);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/get/{oid}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::getCharacter)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/create/{username}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::createCharacter);
     }
 
 }
