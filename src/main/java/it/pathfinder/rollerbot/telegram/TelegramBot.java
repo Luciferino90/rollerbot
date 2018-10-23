@@ -35,24 +35,16 @@ public class TelegramBot extends TelegramLongPollingBot
     private ConfigBean configBean;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private EndpointsListener endpointsListener;
-
-    @Autowired
     private TelegramUserService telegramUserService;
 
     private static Logger logger = LogManager.getLogger();
 
     private WebClient webClient;
 
-
-
     @PostConstruct
     public void init()
     {
-        webClient = WebClient.create("http://localhost:8080");
+        webClient = WebClient.create("http://localhost:" + configBean.getServerPort());
     }
 
     @Override
@@ -99,15 +91,6 @@ public class TelegramBot extends TelegramLongPollingBot
 
     private String prepareUri(String endPoint)
     {
-        /*String finalEndPoint = endPoint;
-        Optional<Boolean> isApi = endpointsListener.getSupportedEndPoint()
-                .stream()
-                .map(suppEndPoint -> suppEndPoint.startsWith(finalEndPoint.split(" ")[0]))
-                .findAny();
-
-        if (isApi.isPresent() && isApi.get()){
-            endPoint = (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
-        }*/
         return (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
     }
 

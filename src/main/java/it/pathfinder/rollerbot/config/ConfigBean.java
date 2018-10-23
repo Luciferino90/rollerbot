@@ -17,4 +17,7 @@ public class ConfigBean {
     @Value("${spring.webservices.path}")
     private String springWebservicesPath;
 
+    @Value("${server.port}")
+    private Integer serverPort;
+
 }
