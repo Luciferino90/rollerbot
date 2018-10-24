@@ -32,7 +32,7 @@ public class ParserService {
                 .forEach(l -> dicesResult.addSingleDiceResponse(manageSingleFormula(formulaMul.getFormula())));
         return dicesResult;
     }
-    //4d6
+
     /**
      * Manage multiplier at the start of the request
      * @param formula

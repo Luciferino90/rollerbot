@@ -4,10 +4,13 @@ import it.pathfinder.rollerbot.webflux.handler.CustomThrowsHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.server.*;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class CustomThrowsRouter extends BasicRouter {
+public class StatsRouter extends BasicRouter {
 
     @Bean
     public RouterFunction<ServerResponse> customThrowsRouting(CustomThrowsHandler customThrowsHandler)

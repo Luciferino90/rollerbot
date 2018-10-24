@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CustomThrowsHandler extends BasicHandler implements DaoHandler {
+public class StatsHandler extends BasicHandler implements DaoHandler {
 
-    private Logger logger = LoggerFactory.getLogger(CustomThrowsHandler.class);
+    private Logger logger = LoggerFactory.getLogger(StatsHandler.class);
 
     @Autowired
     private CustomThrowsService customThrowsService;
