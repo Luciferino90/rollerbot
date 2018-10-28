@@ -21,7 +21,6 @@ public class GenericController extends BasicController {
         TelegramUser tgUser = telegramUserService.findByTgOid(Long.parseLong(request.queryParam("tgOid").orElse("0")))
                 .orElse(telegramUserService.createAnonUser());
 
-        // Find variables
         String expression = variablesService.manageStrings(tgUser, request.pathVariable("expression"));
 
         // DO math

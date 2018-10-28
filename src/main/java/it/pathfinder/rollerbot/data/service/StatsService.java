@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,13 +20,14 @@ public class StatsService {
     @Autowired
     private PathfinderPgService pathfinderPgService;
 
-    public Stats get(PathfinderPg pathfinderPg) {
+    public Stats findByCharacter(PathfinderPg pathfinderPg) {
         return statsRepository.findAllByPathfinderPg(pathfinderPg);
     }
 
     public List<Stats> list(TelegramUser telegramUser) {
         return pathfinderPgService.list(telegramUser)
                 .stream().map(pathfinderPg -> statsRepository.findAllByPathfinderPg(pathfinderPg))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -36,7 +38,7 @@ public class StatsService {
     public Stats set(PathfinderPg pathfinderPg, String name, Integer value) {
         Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg);
         if (stat == null)
-            stat = new Stats();
+            stat = new Stats(pathfinderPg);
         switch (name.toUpperCase()) {
             case "HP":
                 stat.setHp(value);
@@ -89,5 +91,48 @@ public class StatsService {
         }
         return statsRepository.save(stat);
     }
+
+    public Integer get(PathfinderPg pathfinderPg, String name) {
+        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg);
+        if (stat == null)
+            stat = new Stats();
+        switch (name.toUpperCase()) {
+            case "HP":
+                return stat.getHp();
+            case "STR":
+                return stat.getAsStrength();
+            case "DEX":
+                return stat.getAsDextery();
+            case "COS":
+                return stat.getAsConstitution();
+            case "CHA":
+                return stat.getAsCharisma();
+            case "INT":
+                return stat.getAsIntelligence();
+            case "WIS":
+                return stat.getAsWisdom();
+            case "FOR":
+                return stat.getTsFortitude();
+            case "WIL":
+                return stat.getTsWill();
+            case "REF":
+                return stat.getTsReflex();
+            case "BAB":
+                return stat.getBaseAttackBonus();
+            case "LVL":
+                return stat.getLevel();
+            case "INIT":
+                return stat.getInit();
+            case "AC":
+                return stat.getArmorClass();
+            case "SAC":
+                return stat.getSurpriseArmorClass();
+            case "CAC":
+                return stat.getContactArmorClass();
+            default:
+                return 0;
+        }
+    }
+
 
 }

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ public class StatsController extends BasicController implements DaoController {
         Optional<TelegramUser> telegramUser = telegramUserService.findByTgOid(request.getTgOid());
 
         return telegramUser.<GenericDTO>map(telegramUser1 ->
-                new StatsDetail(statsService.get(telegramUser1.getDefaultPathfinderPg())))
+                new StatsDetail(statsService.findByCharacter(telegramUser1.getDefaultPathfinderPg())))
                 .orElseGet(() ->
                         new Error("User not found"));
     }
@@ -46,10 +47,14 @@ public class StatsController extends BasicController implements DaoController {
         Request request = readRequest(serverRequest);
         Optional<TelegramUser> telegramUser = telegramUserService.findByTgOid(request.getTgOid());
 
-        return telegramUser.<GenericDTO>map(telegramUser1 ->
-                new ResponseList(statsService.list(telegramUser1).stream().map(StatsDetail::new).collect(Collectors.toList())))
-                .orElseGet(() ->
-                        new Error("User not found"));
+        if (telegramUser.isPresent()) {
+            List<StatsDetail> statsList = statsService.list(telegramUser.get()).stream().map(StatsDetail::new).collect(Collectors.toList());
+            if (statsList.isEmpty())
+                return new Error("No stats for pathfinder pg: " + telegramUser.get().getDefaultPathfinderPg());
+            else
+                return new ResponseList(statsList.stream().map(s -> (GenericDTO) s).collect(Collectors.toList()));
+        }
+        return new Error("User not found");
     }
 
     @Override

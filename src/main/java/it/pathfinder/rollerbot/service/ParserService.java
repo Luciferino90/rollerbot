@@ -1,12 +1,18 @@
 package it.pathfinder.rollerbot.service;
 
+import dto.generic.Error;
 import dto.generic.GenericDTO;
 import dto.generic.dices.Dices;
 import dto.generic.dices.SingleDiceResponse;
 import it.pathfinder.rollerbot.custom.Formula;
 import it.pathfinder.rollerbot.custom.FormulaMul;
+import it.pathfinder.rollerbot.exception.InvalidExpression;
+import org.codehaus.janino.CompileException;
+import org.codehaus.janino.Parser;
+import org.codehaus.janino.Scanner;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.LongStream;
@@ -28,8 +34,14 @@ public class ParserService {
     public GenericDTO parseFormula(String formulaString, String username) {
         Dices dicesResult = new Dices(username);
         FormulaMul formulaMul = manageMultiplier(formulaString);
-        LongStream.rangeClosed(0L, formulaMul.getMultiplier() - 1)
-                .forEach(l -> dicesResult.addSingleDiceResponse(manageSingleFormula(formulaMul.getFormula())));
+        try {
+            LongStream.rangeClosed(0L, formulaMul.getMultiplier() - 1)
+                    .forEach(l ->
+                            dicesResult.addSingleDiceResponse(manageSingleFormula(formulaMul.getFormula()))
+                    );
+        } catch (InvalidExpression ex) {
+            return new Error(ex.getMessage());
+        }
         return dicesResult;
     }
 
@@ -61,7 +73,11 @@ public class ParserService {
         Formula formulaASync = new Formula(formulaString);
         formulaASync.parse();
         singleDiceResponse.setPartialResult(formulaASync.getFormulaString());
-        singleDiceResponse.setResult(String.valueOf(formulaASync.evaluate()));
+        try {
+            singleDiceResponse.setResult(String.valueOf(formulaASync.evaluate()));
+        } catch (CompileException | Parser.ParseException | Scanner.ScanException | InvocationTargetException ex) {
+            throw new InvalidExpression("Invalid formula " + formula.getFormulaString());
+        }
         return singleDiceResponse;
     }
 

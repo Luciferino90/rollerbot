@@ -57,11 +57,11 @@ public class CustomController extends BasicController implements DaoController {
 
         if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
             return new Error("User not registered");
-        if (!customService.findByUserAndCustomName(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg()).isPresent())
+        if (!customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg()).isPresent())
             return new Error("No var found for var " + request.getName() + " tgUser " + telegramUser.getTgUsername() +
                     (telegramUser.getDefaultPathfinderPg() != null ? String.format(" and character name %s", telegramUser.getDefaultPathfinderPg().getName()) : ""));
 
-        Optional<Custom> res = customService.findByUserAndCustomName(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg());
+        Optional<Custom> res = customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg());
 
         return res.<GenericDTO>map(CustomDetail::new)
                 .orElseGet(() ->

@@ -40,7 +40,7 @@ public class PathfinderPgService {
         if (pathfinderPg == null)
             return set(username, user);
         else {
-            Stats stat = statsService.get(pathfinderPg);
+            Stats stat = statsService.findByCharacter(pathfinderPg);
             if (stat == null)
                 stat = new Stats(pathfinderPg);
             stat.init();
@@ -49,7 +49,7 @@ public class PathfinderPgService {
         return pathfinderPg;
     }
 
-    public PathfinderPg save(PathfinderPg pathfinderPg) {
+    private PathfinderPg save(PathfinderPg pathfinderPg) {
         return pathfinderPgRepository.save(pathfinderPg);
     }
 

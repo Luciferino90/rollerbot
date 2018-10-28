@@ -17,7 +17,7 @@ public class StatsRouter extends BasicRouter {
         return RouterFunctions
                 .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/set/{name}/{value}")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::set)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/get")
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/findByCharacter")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::get)
                 .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/delete/{name}")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::delete)

@@ -15,7 +15,7 @@ public class PathfinderPgRouter extends BasicRouter {
     @Bean
     public RouterFunction<ServerResponse> routeGet(PathfinderPgHandler pathfinderPgHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/get/{name}")
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/findByCharacter/{name}")
                         .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::get)
                 .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/set/{name}")
                         .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::set)

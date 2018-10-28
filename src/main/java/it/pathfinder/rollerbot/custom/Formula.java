@@ -1,9 +1,13 @@
 package it.pathfinder.rollerbot.custom;
 
+import org.codehaus.janino.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
+import org.codehaus.janino.Parser;
+import org.codehaus.janino.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Random;
@@ -37,15 +41,11 @@ public class Formula {
         manageStandard();
     }
 
-    public Integer evaluate() {
-        Integer result = 0;
-        try {
-            ExpressionEvaluator ee = new ExpressionEvaluator();
-            ee.cook(formulaString);
-            result = (Integer) ee.evaluate(null);
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-        }
+    public Integer evaluate() throws CompileException, Parser.ParseException, Scanner.ScanException, InvocationTargetException {
+        Integer result;
+        ExpressionEvaluator ee = new ExpressionEvaluator();
+        ee.cook(formulaString);
+        result = (Integer) ee.evaluate(null);
         return result;
     }
 
@@ -180,7 +180,7 @@ public class Formula {
         changeFormula(toRemove, String.format("( %s )", result));
     }
 
-    public void changeFormula(String toRemove, String toReplace) {
+    private void changeFormula(String toRemove, String toReplace) {
         formulaString = formulaString.replace(toRemove, toReplace);
     }
 

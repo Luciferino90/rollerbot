@@ -15,7 +15,7 @@ public class DefaultRouter extends BasicRouter {
     @Bean
     public RouterFunction<ServerResponse> defaultRouting(DefaultHandler defaultHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/def/get/{name}")
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/def/findByCharacter/{name}")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), defaultHandler::get)
                 .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/def/list")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), defaultHandler::list);
