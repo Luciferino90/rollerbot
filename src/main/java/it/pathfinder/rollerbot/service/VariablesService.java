@@ -1,15 +1,23 @@
 package it.pathfinder.rollerbot.service;
 
 import it.pathfinder.rollerbot.data.entity.Custom;
+import it.pathfinder.rollerbot.data.entity.Default;
+import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.service.CustomService;
+import it.pathfinder.rollerbot.data.service.DefaultService;
+import it.pathfinder.rollerbot.data.service.StatsService;
 import it.pathfinder.rollerbot.utility.PrivateNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class VariablesService {
@@ -18,41 +26,87 @@ public class VariablesService {
     private CustomService customService;
 
     @Autowired
+    private DefaultService defaultService;
+
+    @Autowired
+    private StatsService statsService;
+
+    @Autowired
     private PrivateNames privateNames;
 
     public String manageStrings(TelegramUser telegramUser, String expression) {
-        return manageCustomCommands(telegramUser, expression);
+        return manage(telegramUser, expression);
     }
 
-    private String defaultThrows(TelegramUser telegramUser, String expression) {
-        List<String> variableList = privateNames.getPrivateCommandMap()
-                .keySet()
+    // while nothing is found:
+    //      First we check for default
+    //          then we check for custom
+
+    public String manage(TelegramUser telegramUser, String expression) {
+        // Retrieve list of default and list of var
+        List<String> defaultList = privateNames.getPrivateCommandMap()
+                .entrySet()
                 .stream()
-                .sorted((a, b) -> Integer.compare(b.length(), a.length()))
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        for (String variable : variableList) {
-            if (expression.contains(variable)) {
-                expression = expression; //defaultThrows(telegramUser, expression.replace(variable, fetchVariable()));
+        List<String> statsList = privateNames.getPrivateVariableMap()
+                .entrySet()
+                .stream()
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+
+        List<String> customList = customService.findByPathfinderPg(telegramUser.getDefaultPathfinderPg())
+                .stream()
+                .flatMap(customs -> customs
+                        .stream()
+                        .map(Custom::getCustomName))
+                .collect(Collectors.toList());
+
+        List<String> vars = Stream.concat(
+                defaultList.stream(),
+                Stream.concat(
+                        statsList.stream(),
+                        customList.stream()
+                )
+        ).sorted((a, b) -> Integer.compare(b.length(), a.length()))
+                .collect(Collectors.toList());
+
+        int count = 0;
+        boolean found = true;
+        while (found) {
+            String key = vars.get(count);
+            Pattern pattern = Pattern.compile(key);
+            Matcher matcher = pattern.matcher(expression);
+            count++;
+            while (matcher.find()) {
+                //substitution
+                if (defaultList.contains(key))
+                    expression = replacingDefault(key, expression);
+                else if (statsList.contains(key))
+                    expression = replacingStats(key, expression, telegramUser.getDefaultPathfinderPg());
+                else if (customList.contains(key))
+                    expression = replacingCustom(expression, key, telegramUser);
+                count = 0;
             }
+            if (count == vars.size())
+                found = false;
         }
         return expression;
     }
 
-    private String manageCustomCommands(TelegramUser telegramUser, String expression) {
-        Optional<Custom> customThrows = Optional.empty();
-
-        if (telegramUser.getDefaultPathfinderPg() != null)
-            customThrows = customService.findByUserAndCustomName(telegramUser, expression, telegramUser.getDefaultPathfinderPg());
-
-        if (customThrows.isPresent())
-            return customThrows.get().getCustomValue();
-        else
-            return expression;
+    private String replacingDefault(String key, String expression) {
+        Optional<Default> defaultObj = defaultService.get(key);
+        return defaultObj.map(aDefault -> expression.replace(key, aDefault.getCommand())).orElse(expression);
     }
 
-    public Optional<Custom> findByCustomNameAndTelegramUser(String variable, TelegramUser telegramUser) {
-        return Optional.empty();
+    private String replacingStats(String key, String expression, PathfinderPg pathfinderPg) {
+        return expression.replace(key, String.valueOf(statsService.get(pathfinderPg, key)));
+    }
+
+    private String replacingCustom(String expression, String key, TelegramUser telegramUser) {
+        Optional<Custom> custom = customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, key, telegramUser.getDefaultPathfinderPg());
+        return custom.map(custom1 -> expression.replace(key, custom1.getCustomValue())).orElse(expression);
     }
 
 }

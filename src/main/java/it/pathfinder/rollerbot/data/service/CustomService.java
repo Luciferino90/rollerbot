@@ -20,7 +20,7 @@ public class CustomService {
     @Autowired
     private TelegramUserService telegramUserService;
 
-    public Optional<Custom> findByUserAndCustomName(TelegramUser telegramUser, String customName, PathfinderPg pathfinderPg) {
+    public Optional<Custom> findByUserAndCustomNameAndPathfinderPg(TelegramUser telegramUser, String customName, PathfinderPg pathfinderPg) {
         return customRepository.findByCustomNameAndTelegramUserAndPathfinderPg(customName, telegramUser, pathfinderPg);
     }
 
@@ -28,7 +28,7 @@ public class CustomService {
         TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElse(null);
         if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
             return Optional.empty();
-        if (findByUserAndCustomName(telegramUser, customName, telegramUser.getDefaultPathfinderPg()).isPresent())
+        if (findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg()).isPresent())
             return Optional.empty();
 
 
@@ -44,7 +44,7 @@ public class CustomService {
         TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElse(null);
         if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
             return Optional.empty();
-        Custom custom = findByUserAndCustomName(telegramUser, customName, telegramUser.getDefaultPathfinderPg())
+        Custom custom = findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg())
                 .orElse(new Custom());
 
         custom.setTelegramUser(telegramUser);
@@ -63,7 +63,7 @@ public class CustomService {
         if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
             return Optional.empty();
 
-        Optional<Custom> customThrows = findByUserAndCustomName(telegramUser, customName, telegramUser.getDefaultPathfinderPg());
+        Optional<Custom> customThrows = findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg());
         customThrows.ifPresent(customThrows1 -> customRepository.delete(customThrows1));
         return customThrows;
     }
