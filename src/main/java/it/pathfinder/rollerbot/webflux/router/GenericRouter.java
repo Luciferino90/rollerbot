@@ -16,9 +16,7 @@ public class GenericRouter extends BasicRouter {
     public RouterFunction<ServerResponse> routeDiceRoller(GenericHandler genericHandler) {
         return RouterFunctions
                 .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/{expression}")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/hello")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::helloWorld);
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), genericHandler::diceRoller);
     }
 
 }

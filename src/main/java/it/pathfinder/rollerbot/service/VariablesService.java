@@ -1,8 +1,8 @@
 package it.pathfinder.rollerbot.service;
 
-import it.pathfinder.rollerbot.data.entity.CustomThrows;
+import it.pathfinder.rollerbot.data.entity.Custom;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
-import it.pathfinder.rollerbot.data.service.CustomThrowsService;
+import it.pathfinder.rollerbot.data.service.CustomService;
 import it.pathfinder.rollerbot.utility.PrivateNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,12 @@ import java.util.stream.Collectors;
 public class VariablesService {
 
     @Autowired
-    private CustomThrowsService customThrowsService;
+    private CustomService customService;
 
     @Autowired
     private PrivateNames privateNames;
 
-    public String manageStrings(TelegramUser telegramUser, String expression)
-    {
+    public String manageStrings(TelegramUser telegramUser, String expression) {
         return manageCustomCommands(telegramUser, expression);
     }
 
@@ -40,20 +39,20 @@ public class VariablesService {
         return expression;
     }
 
-    private String manageCustomCommands(TelegramUser telegramUser, String expression)
-    {
-        Optional<CustomThrows> customThrows = customThrowsService.findByCustomNameAndUser(telegramUser, expression);
+    private String manageCustomCommands(TelegramUser telegramUser, String expression) {
+        Optional<Custom> customThrows = Optional.empty();
+
+        if (telegramUser.getDefaultPathfinderPg() != null)
+            customThrows = customService.findByUserAndCustomName(telegramUser, expression, telegramUser.getDefaultPathfinderPg());
+
         if (customThrows.isPresent())
-            return customThrows.get().getCustomCommand();
+            return customThrows.get().getCustomValue();
         else
             return expression;
     }
 
-    public Optional<CustomThrows> findByCustomNameAndTelegramUser(String variable, TelegramUser telegramUser)
-    {
+    public Optional<Custom> findByCustomNameAndTelegramUser(String variable, TelegramUser telegramUser) {
         return Optional.empty();
     }
-
-
 
 }

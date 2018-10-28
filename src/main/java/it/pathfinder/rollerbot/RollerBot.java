@@ -13,16 +13,14 @@ import org.telegram.telegrambots.ApiContextInitializer;
 @EnableJpaRepositories
 public class RollerBot {
 
-    @Bean
-    public ObjectMapper objectMapper()
-    {
-        return new ObjectMapper();
-    }
-
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         ApiContextInitializer.init();
         SpringApplication.run(RollerBot.class, args);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
 }

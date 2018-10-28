@@ -1,83 +1,60 @@
-use rollerbot;
+CREATE TABLE `custom` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `pathfinder_pg_id` bigint(20) DEFAULT NULL,
+  `telegram_user_id` bigint(20) DEFAULT NULL,
+  `custom_name` varchar(45) DEFAULT NULL,
+  `custom_command` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE IF NOT EXISTS `telegram_user` (
+CREATE TABLE `default_vars` (
   `id` bigint(20) NOT NULL,
-  `tg_name` varchar(45),
-  `tg_surname` varchar(45),
-  `tg_username` varchar(45),
+  `name` varchar(45) DEFAULT NULL,
+  `command` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `pathfinder_pg` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `telegram_user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `stats` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `pathfinder_pg_id` bigint(20) DEFAULT NULL,
+  `hp` bigint(20) DEFAULT NULL,
+  `as_strength` bigint(20) DEFAULT NULL,
+  `as_dexterity` bigint(20) DEFAULT NULL,
+  `as_constitution` bigint(20) DEFAULT NULL,
+  `as_intelligence` bigint(20) DEFAULT NULL,
+  `as_wisdom` bigint(20) DEFAULT NULL,
+  `as_charisma` bigint(20) DEFAULT NULL,
+  `ts_fortitude` bigint(20) DEFAULT NULL,
+  `ts_will` bigint(20) DEFAULT NULL,
+  `ts_reflex` bigint(20) DEFAULT NULL,
+  `base_attack_bonus` bigint(20) DEFAULT NULL,
+  `level` bigint(20) DEFAULT NULL,
+  `init` bigint(20) DEFAULT NULL,
+  `armor_class` bigint(20) DEFAULT NULL,
+  `surprise_armor_class` bigint(20) DEFAULT NULL,
+  `contact_armor_class` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `pathfinder_pg_id_UNIQUE` (`pathfinder_pg_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `telegram_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tg_name` varchar(45) DEFAULT NULL,
+  `tg_surname` varchar(45) DEFAULT NULL,
+  `tg_username` varchar(45) DEFAULT NULL,
   `register_date` datetime NOT NULL,
   `tg_id` bigint(20) DEFAULT NULL,
-  `email` varchar(45),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `pathfinder_pg` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(45),
-  `telegram_user_id` bigint(20),
+  `email` varchar(45) DEFAULT NULL,
+  `default_pathfinder_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`telegram_user_id`) REFERENCES `telegram_user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `levels` (
-  `id` bigint(20),
-  `pathfinder_pg_id` bigint(20),
-  `level_number` bigint(20),
-  `st_fortitude` bigint(20),
-  `st_will` bigint(20),
-  `st_reflex` bigint(20),
-  `lvl_strength` bigint(20),
-  `lvl_dexterity` bigint(20),
-  `lvl_constitution` bigint(20),
-  `lvl_intelligence` bigint(20),
-  `lvl_wisdom` bigint(20),
-  `lvl_charisma` bigint(20),
-  `lf` bigint(20),
-  `custom` text,
-  PRIMARY KEY(`id`),
-  FOREIGN KEY (`pathfinder_pg_id`) REFERENCES `pathfinder_pg`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `stats` (
-  `id` bigint(20),
-  `pathfinder_pg_id` bigint(20),
-  `lvl_strength` bigint(20),
-  `lvl_dexterity` bigint(20),
-  `lvl_constitution` bigint(20),
-  `lvl_intelligence` bigint(20),
-  `lvl_wisdom` bigint(20),
-  `lvl_charisma` bigint(20),
-  FOREIGN KEY (`pathfinder_pg_id`) REFERENCES `pathfinder_pg`(`id`),
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `custom_throws` (
-  `id` bigint(20),
-  `pathfinder_pg_id` bigint(20),
-  `telegram_user_id` bigint(20),
-  `custom_name` varchar(45),
-  `custom_command` text,
-  FOREIGN KEY (`telegram_user_id`) REFERENCES `telegram_user`(`id`),
-  FOREIGN KEY (`pathfinder_pg_id`) REFERENCES `pathfinder_pg`(`id`),
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `default_throws` (
-  `id` bigint(20),
-  `name` varchar(45),
-  `command` text,
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `custom_variables` (
-  `id` bigint(20),
-  `pathfinder_pg_id` bigint(20),
-  `telegram_user_id` bigint(20),
-  `custom_name` varchar(45),
-  `custom_value` varchar(45),
-  FOREIGN KEY (`telegram_user_id`) REFERENCES `telegram_user`(`id`),
-  FOREIGN KEY (`pathfinder_pg_id`) REFERENCES `pathfinder_pg`(`id`),
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+  UNIQUE KEY `default_pathfinder_id_UNIQUE` (`default_pathfinder_id`),
+  UNIQUE KEY `tg_id_UNIQUE` (`tg_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;

@@ -1,6 +1,6 @@
 package it.pathfinder.rollerbot.webflux.router;
 
-import it.pathfinder.rollerbot.webflux.handler.CustomThrowsHandler;
+import it.pathfinder.rollerbot.webflux.handler.StatsHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -13,18 +13,16 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class StatsRouter extends BasicRouter {
 
     @Bean
-    public RouterFunction<ServerResponse> customThrowsRouting(CustomThrowsHandler customThrowsHandler)
-    {
+    public RouterFunction<ServerResponse> statsRouting(StatsHandler statsHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/throwsset/{formulaName}/{formulaValue}")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), customThrowsHandler::set)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/throwsreset/{formulaName}/{formulaValue}")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), customThrowsHandler::reset)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/throwsdelete/{formulaName}")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), customThrowsHandler::delete)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/throwslist/formula")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), customThrowsHandler::list);
-
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/set/{name}/{value}")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::set)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/get")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::get)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/delete/{name}")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::delete)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/stat/list")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), statsHandler::list);
     }
 
 }

@@ -11,15 +11,13 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import javax.annotation.PostConstruct;
 
 @Component
-public class TelegramBotWrapper
-{
+public class TelegramBotWrapper {
+    private static Logger logger = LogManager.getLogger();
     @Autowired
     private TelegramBot telegramBot;
 
-    private static Logger logger = LogManager.getLogger();
-
     @PostConstruct
-    public void init(){
+    public void init() {
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
             botsApi.registerBot(telegramBot);

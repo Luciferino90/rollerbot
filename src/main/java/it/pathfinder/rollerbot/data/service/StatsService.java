@@ -1,8 +1,93 @@
 package it.pathfinder.rollerbot.data.service;
 
+import it.pathfinder.rollerbot.data.entity.PathfinderPg;
+import it.pathfinder.rollerbot.data.entity.Stats;
+import it.pathfinder.rollerbot.data.entity.TelegramUser;
+import it.pathfinder.rollerbot.data.repository.StatsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
+
+    @Autowired
+    private StatsRepository statsRepository;
+
+    @Autowired
+    private PathfinderPgService pathfinderPgService;
+
+    public Stats get(PathfinderPg pathfinderPg) {
+        return statsRepository.findAllByPathfinderPg(pathfinderPg);
+    }
+
+    public List<Stats> list(TelegramUser telegramUser) {
+        return pathfinderPgService.list(telegramUser)
+                .stream().map(pathfinderPg -> statsRepository.findAllByPathfinderPg(pathfinderPg))
+                .collect(Collectors.toList());
+    }
+
+    public Stats save(Stats stats) {
+        return statsRepository.save(stats);
+    }
+
+    public Stats set(PathfinderPg pathfinderPg, String name, Integer value) {
+        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg);
+        if (stat == null)
+            stat = new Stats();
+        switch (name.toUpperCase()) {
+            case "HP":
+                stat.setHp(value);
+                break;
+            case "STR":
+                stat.setAsStrength(value);
+                break;
+            case "DEX":
+                stat.setAsDextery(value);
+                break;
+            case "COS":
+                stat.setAsConstitution(value);
+                break;
+            case "CHA":
+                stat.setAsCharisma(value);
+                break;
+            case "INT":
+                stat.setAsIntelligence(value);
+                break;
+            case "WIS":
+                stat.setAsWisdom(value);
+                break;
+            case "FOR":
+                stat.setTsFortitude(value);
+                break;
+            case "WIL":
+                stat.setTsWill(value);
+                break;
+            case "REF":
+                stat.setTsReflex(value);
+                break;
+            case "BAB":
+                stat.setBaseAttackBonus(value);
+                break;
+            case "LVL":
+                stat.setLevel(value);
+                break;
+            case "INIT":
+                stat.setInit(value);
+                break;
+            case "AC":
+                stat.setArmorClass(value);
+                break;
+            case "SAC":
+                stat.setSurpriseArmorClass(value);
+                break;
+            case "CAC":
+                stat.setContactArmorClass(value);
+                break;
+        }
+        return statsRepository.save(stat);
+    }
 
 }

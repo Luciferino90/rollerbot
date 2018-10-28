@@ -1,7 +1,5 @@
 package it.pathfinder.rollerbot;
 
-import static org.hamcrest.Matchers.equalTo;
-
 import it.pathfinder.rollerbot.service.ParserService;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,8 +34,7 @@ public class HelloControllerTest {
 
     @Ignore
     @Test
-    public void randomize()
-    {
+    public void randomize() {
         String diceFormula = "2x2d10";
         ParserService parserService = new ParserService();
         System.out.println(parserService.parseFormula(diceFormula, "internalTest"));
@@ -44,8 +42,7 @@ public class HelloControllerTest {
 
     @Ignore
     @Test
-    public void multiBracketsSplitterTest()
-    {
+    public void multiBracketsSplitterTest() {
         ParserService parserService = new ParserService();
         //String formula = "3x10d4+10d6r(1)+$var$";
         String formula = "3*3d6";

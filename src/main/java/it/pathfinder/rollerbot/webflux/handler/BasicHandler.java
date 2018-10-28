@@ -1,12 +1,8 @@
 package it.pathfinder.rollerbot.webflux.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dto.generic.DataDTO;
 import dto.generic.GenericDTO;
 import dto.response.generic.GenericResponse;
-import it.pathfinder.rollerbot.data.service.PathfinderPgService;
-import it.pathfinder.rollerbot.data.service.TelegramUserService;
-import it.pathfinder.rollerbot.service.ParserService;
+import it.pathfinder.rollerbot.webflux.controller.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -18,24 +14,25 @@ import reactor.core.publisher.Mono;
 public abstract class BasicHandler {
 
     @Autowired
-    ParserService parserService;
+    CustomController customController;
 
     @Autowired
-    TelegramUserService telegramUserService;
+    PathfinderPgController pathfinderPgController;
 
     @Autowired
-    PathfinderPgService pathfinderPgService;
+    StatsController statsController;
 
     @Autowired
-    ObjectMapper objectMapper;
+    DefaultController defaultController;
 
-    Mono responseT(GenericDTO data)
-    {
+    @Autowired
+    GenericController genericController;
+
+    Mono responseT(GenericDTO data) {
         return Mono.just(new GenericResponse(data));
     }
 
-    Mono<ServerResponse> response(GenericDTO data)
-    {
+    Mono<ServerResponse> response(GenericDTO data) {
         GenericResponse response = new GenericResponse();
         response.setData(data);
         return ServerResponse.ok()
@@ -43,8 +40,7 @@ public abstract class BasicHandler {
                 .body(BodyInserters.fromPublisher(Mono.just(response), GenericResponse.class));
     }
 
-    Mono<ServerResponse> response(String plainText)
-    {
+    Mono<ServerResponse> response(String plainText) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(plainText));
