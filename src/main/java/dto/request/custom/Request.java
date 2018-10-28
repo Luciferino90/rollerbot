@@ -1,4 +1,4 @@
-package dto.request.customthrows;
+package dto.request.custom;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomThrowsRequest {
+public class Request {
 
     private Long tgOid;
-    private String customName;
-    private String customFormula;
+    private String name;
+    private String value;
 
 }

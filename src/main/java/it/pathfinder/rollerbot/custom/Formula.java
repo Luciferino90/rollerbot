@@ -4,7 +4,9 @@ import org.codehaus.janino.ExpressionEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -13,26 +15,21 @@ import java.util.stream.Stream;
 
 public class Formula {
 
-    private Logger logger = LoggerFactory.getLogger(Formula.class);
-
     private static final String DICE_SEPARATOR = "d";
     private static final Long INITIAL_RANDOMIZE = 0L;
-
     // Patterns
-    private static final Pattern DICE_PATTERN = Pattern.compile("[0-9]+"+ DICE_SEPARATOR +"[0-9]{1,3}");
+    private static final Pattern DICE_PATTERN = Pattern.compile("[0-9]+" + DICE_SEPARATOR + "[0-9]{1,3}");
     private static final Pattern DICE_PATTERN_MAX = Pattern.compile("[0-9]+d[0-9]{1,3}h\\([0-9]+\\)");
     private static final Pattern DICE_PATTERN_MIN = Pattern.compile("[0-9]+d[0-9]{1,3}l\\([0-9]+\\)");
     private static final Pattern DICE_PATTERN_RETRY = Pattern.compile("[0-9]+d[0-9]{1,3}r\\([0-9]+\\)");
-
+    private Logger logger = LoggerFactory.getLogger(Formula.class);
     private String formulaString;
 
-    public Formula(String formula)
-    {
+    public Formula(String formula) {
         this.formulaString = formula;
     }
 
-    public void parse()
-    {
+    public void parse() {
         manageVariables();
         manageMaxLimit();
         manageMinLimit();
@@ -40,42 +37,38 @@ public class Formula {
         manageStandard();
     }
 
-    public Integer evaluate()
-    {
+    public Integer evaluate() {
         Integer result = 0;
         try {
             ExpressionEvaluator ee = new ExpressionEvaluator();
             ee.cook(formulaString);
             result = (Integer) ee.evaluate(null);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
         return result;
     }
 
-    public String expr(String expression)
-    {
+    public String expr(String expression) {
         String result = expression;
         try {
             ExpressionEvaluator ee = new ExpressionEvaluator();
             ee.cook(expression);
             result = String.valueOf(ee.evaluate(null));
-        } catch (Exception ex){
+        } catch (Exception ex) {
             logger.warn(ex.getMessage());
         }
         return result;
     }
 
-    private void manageMaxLimit()
-    {
+    private void manageMaxLimit() {
         Matcher maxOf = DICE_PATTERN_MAX.matcher(formulaString);
-        while (maxOf.find()){
+        while (maxOf.find()) {
             resolveMaxOf(maxOf);
         }
     }
 
-    private void resolveMaxOf(Matcher maxOf)
-    {
+    private void resolveMaxOf(Matcher maxOf) {
         String interested = maxOf.group();
         Long maxOfValue = Long.valueOf(interested.split("\\(")[1].split("\\)")[0]);
         String result = wrapperDicerLimit()
@@ -87,16 +80,14 @@ public class Formula {
         formulaString = formulaString.replace(interested, "(" + result + ")");
     }
 
-    private void manageMinLimit()
-    {
+    private void manageMinLimit() {
         Matcher minOf = DICE_PATTERN_MIN.matcher(formulaString);
-        while (minOf.find()){
+        while (minOf.find()) {
             resolveMinOf(minOf);
         }
     }
 
-    private void resolveMinOf(Matcher minOf)
-    {
+    private void resolveMinOf(Matcher minOf) {
         String interested = minOf.group();
         Long minOfValue = Long.valueOf(interested.split("\\(")[1].split("\\)")[0]);
         String result = wrapperDicerLimit()
@@ -108,16 +99,14 @@ public class Formula {
         formulaString = formulaString.replace(interested, "(" + result + ")");
     }
 
-    private void manageRetry()
-    {
+    private void manageRetry() {
         Matcher retry = DICE_PATTERN_RETRY.matcher(formulaString);
-        while (retry.find()){
+        while (retry.find()) {
             resolveRetry(retry);
         }
     }
 
-    private void resolveRetry(Matcher retry)
-    {
+    private void resolveRetry(Matcher retry) {
         String interested = retry.group();
         Long notValid = Long.valueOf(interested.split("\\(")[1].split("\\)")[0]);
         String result = wrapperDicerLimit(notValid)
@@ -127,16 +116,14 @@ public class Formula {
         setResultString(interested, result);
     }
 
-    private void manageStandard()
-    {
+    private void manageStandard() {
         Matcher diceMatcher = DICE_PATTERN.matcher(formulaString);
-        while (diceMatcher.find()){
+        while (diceMatcher.find()) {
             resolveStandard(diceMatcher);
         }
     }
 
-    private void resolveStandard(Matcher diceMatcher)
-    {
+    private void resolveStandard(Matcher diceMatcher) {
         String interested = diceMatcher.group();
         String result = wrapperDicerLimit()
                 .filter(Objects::nonNull)
@@ -145,8 +132,7 @@ public class Formula {
         setResultString(interested, result);
     }
 
-    private void manageVariables()
-    {
+    private void manageVariables() {
         String stupidTemplate = "$var$";
         changeFormula(stupidTemplate, "30");
     }
@@ -180,25 +166,21 @@ public class Formula {
         return Stream.empty();
     }
 
-    private LongStream nestedDicer(long numberOfFaces)
-    {
+    private LongStream nestedDicer(long numberOfFaces) {
         Random randomizer = new Random();
         return randomizer
                 .longs(INITIAL_RANDOMIZE + 1L, numberOfFaces + 1L);
     }
 
-    public String getFormulaString()
-    {
+    public String getFormulaString() {
         return formulaString;
     }
 
-    private void setResultString(String toRemove, String result)
-    {
+    private void setResultString(String toRemove, String result) {
         changeFormula(toRemove, String.format("( %s )", result));
     }
 
-    public void changeFormula(String toRemove, String toReplace)
-    {
+    public void changeFormula(String toRemove, String toReplace) {
         formulaString = formulaString.replace(toRemove, toReplace);
     }
 

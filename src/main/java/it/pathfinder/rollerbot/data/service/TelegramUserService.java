@@ -1,5 +1,6 @@
 package it.pathfinder.rollerbot.data.service;
 
+import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.TelegramUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +17,25 @@ public class TelegramUserService {
     @Autowired
     private TelegramUserRepository telegramUserRepository;
 
-    public TelegramUser findOrRegister(User user)
-    {
+    public TelegramUser findOrRegister(User user) {
         Optional<TelegramUser> telegramUser = findByUser(user);
         return telegramUser.orElse(registerUser(user));
     }
 
-    public Optional<TelegramUser> findByUser(User user)
-    {
+    public Optional<TelegramUser> findByUser(User user) {
         if (user.getId() != null)
             return telegramUserRepository.findTelegramUserByTgId(user.getId().longValue());
         else if (!StringUtils.isEmpty(user.getUserName()))
             return telegramUserRepository.findTelegramUserByTgUsername(user.getUserName());
         else
-            return null;
+            return Optional.empty();
     }
 
-    public Optional<TelegramUser> findByTgOid(Long tgOid)
-    {
+    public Optional<TelegramUser> findByTgOid(Long tgOid) {
         return telegramUserRepository.findTelegramUserByTgId(tgOid);
     }
 
-    public TelegramUser registerUser(User user)
-    {
+    public TelegramUser registerUser(User user) {
         TelegramUser telegramUser = telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId()))
                 .orElse(createNewUser(user));
 
@@ -48,18 +45,22 @@ public class TelegramUserService {
         return telegramUserRepository.save(telegramUser);
     }
 
-    private TelegramUser createNewUser(User user)
-    {
+    private TelegramUser createNewUser(User user) {
         TelegramUser telegramUser = new TelegramUser();
         telegramUser.setRegisterDate(new Date());
         telegramUser.setTgId(user.getId().longValue());
         return telegramUser;
     }
 
-    public TelegramUser createAnonUser()
-    {
+    public TelegramUser createAnonUser() {
         TelegramUser telegramUser = new TelegramUser();
         telegramUser.setTgUsername("anonymous");
         return telegramUser;
     }
+
+    public TelegramUser setDefault(TelegramUser telegramUser, PathfinderPg pathfinderPg) {
+        telegramUser.setDefaultPathfinderPg(pathfinderPg);
+        return telegramUserRepository.save(telegramUser);
+    }
+
 }

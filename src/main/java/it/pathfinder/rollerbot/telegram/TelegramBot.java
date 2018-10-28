@@ -1,6 +1,5 @@
 package it.pathfinder.rollerbot.telegram;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.response.generic.GenericResponse;
 import it.pathfinder.rollerbot.config.ConfigBean;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
@@ -22,45 +21,32 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
-public class TelegramBot extends TelegramLongPollingBot
-{
-
-    @Autowired
-    private ConfigBean configBean;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private EndpointsListener endpointsListener;
-
-    @Autowired
-    private TelegramUserService telegramUserService;
+public class TelegramBot extends TelegramLongPollingBot {
 
     private static Logger logger = LogManager.getLogger();
-
+    @Autowired
+    private ConfigBean configBean;
+    @Autowired
+    private TelegramUserService telegramUserService;
     private WebClient webClient;
 
-
-
     @PostConstruct
-    public void init()
-    {
-        webClient = WebClient.create("http://localhost:8080");
+    public void init() {
+        webClient = WebClient.create("http://localhost:" + configBean.getServerPort());
     }
 
     @Override
-    public void onUpdateReceived(Update update)
-    {
+    public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom());
-        String queryParam = "?tgOid="+telegramUser.getTgId();
+        String queryParam = "?tgOid=" + telegramUser.getTgId();
         try {
             GenericResponse response = webClient.get()
                     .uri(prepareUri(message.getText()) + queryParam)
@@ -75,8 +61,7 @@ public class TelegramBot extends TelegramLongPollingBot
         }
     }
 
-    private void sendMessage(String message, Integer messageId, Long chatId)
-    {
+    private void sendMessage(String message, Integer messageId, Long chatId) {
         try {
             execute(new SendMessage()
                     .setText(message)
@@ -97,17 +82,7 @@ public class TelegramBot extends TelegramLongPollingBot
         return configBean.getTelegramBotToken();
     }
 
-    private String prepareUri(String endPoint)
-    {
-        /*String finalEndPoint = endPoint;
-        Optional<Boolean> isApi = endpointsListener.getSupportedEndPoint()
-                .stream()
-                .map(suppEndPoint -> suppEndPoint.startsWith(finalEndPoint.split(" ")[0]))
-                .findAny();
-
-        if (isApi.isPresent() && isApi.get()){
-            endPoint = (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
-        }*/
+    private String prepareUri(String endPoint) {
         return (configBean.getSpringWebservicesPath() + endPoint).replace(" ", "/");
     }
 
@@ -128,8 +103,8 @@ class EndpointsListener implements ApplicationListener {
             supportedEndPoint = Arrays.stream(Objects.requireNonNull(applicationContext.getBean(RouterFunctionMapping.class)
                     .getRouterFunction())
                     .toString().split("\n"))
-                        .map(message -> message.split("&& ")[1].split("\\)")[0])
-                        .filter(endpoint -> !endpoint.contains("{"))
+                    .map(message -> message.split("&& ")[1].split("\\)")[0])
+                    .filter(endpoint -> !endpoint.contains("{"))
                     .collect(Collectors.toList());
         }
     }

@@ -8,27 +8,26 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class PagedResponse extends DataDTO implements Serializable
-{
+public abstract class PagedResponse extends DataDTO implements Serializable {
 
-	private static final long serialVersionUID = -2050140538526591952L;
-	long totalElements;
-	long totalPages;
-	long number;
-	long size;
+    private static final long serialVersionUID = -2050140538526591952L;
+    long totalElements;
+    long totalPages;
+    long number;
+    long size;
 
-	private String className;
+    private String className;
 
-	public boolean isFirst(){
-		return isEmpty() || this.getNumber()==0;
-	}
-	
-	public boolean isEmpty(){
-		return this.getTotalElements()==0 ;
-	}
+    public boolean isFirst() {
+        return isEmpty() || this.getNumber() == 0;
+    }
 
-	public boolean isLast(){
-		return isEmpty() || this.getNumber()==(this.getTotalPages()-1);
-	}
+    public boolean isEmpty() {
+        return this.getTotalElements() == 0;
+    }
+
+    public boolean isLast() {
+        return isEmpty() || this.getNumber() == (this.getTotalPages() - 1);
+    }
 
 }

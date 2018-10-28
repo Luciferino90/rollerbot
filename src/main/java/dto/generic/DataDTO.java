@@ -15,10 +15,9 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-@NoArgsConstructor(force=true)
-@JsonSubTypes({ @JsonSubTypes.Type(value = GenericResponse.class) })
-public class DataDTO extends GenericDTO implements Serializable
-{
+@NoArgsConstructor(force = true)
+@JsonSubTypes({@JsonSubTypes.Type(value = GenericResponse.class)})
+public class DataDTO extends GenericDTO implements Serializable {
 
     private static final long serialVersionUID = 20180515_1202L;
 

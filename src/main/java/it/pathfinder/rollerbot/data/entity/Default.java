@@ -4,14 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 
-@Entity
+@Entity(name = "default_vars")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PathfinderPg implements Serializable {
+public class Default implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +22,11 @@ public class PathfinderPg implements Serializable {
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "telegram_user_id")
-    private TelegramUser telegramUser;
+    private String command;
 
     @Override
     public String toString() {
-        return String.format("%s: %s", id, name);
+        return String.format("%s: %s", name, command);
     }
-
 
 }

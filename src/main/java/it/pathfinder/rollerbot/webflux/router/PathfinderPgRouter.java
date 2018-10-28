@@ -15,10 +15,18 @@ public class PathfinderPgRouter extends BasicRouter {
     @Bean
     public RouterFunction<ServerResponse> routeGet(PathfinderPgHandler pathfinderPgHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/get/{oid}")
-                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::getCharacter)
-                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/create/{username}")
-                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::createCharacter);
+                .route(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/get/{name}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::get)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/set/{name}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::set)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/delete/{name}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::delete)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/list")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::list)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/default")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::defaultCharacter)
+                .andRoute(RequestPredicates.GET(configBean.getSpringWebservicesPath() + "/pg/use/{name}")
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), pathfinderPgHandler::useCharacter);
     }
 
 }

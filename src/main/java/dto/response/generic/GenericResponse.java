@@ -12,8 +12,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenericResponse extends GenericDTO implements Serializable
-{
+public class GenericResponse extends GenericDTO implements Serializable {
 
     private static final long serialVersionUID = 20180515_1207L;
 
@@ -21,8 +20,7 @@ public class GenericResponse extends GenericDTO implements Serializable
 
     private GenericDTO data;
 
-    public GenericResponse(GenericDTO data)
-    {
+    public GenericResponse(GenericDTO data) {
         this.data = data;
     }
 

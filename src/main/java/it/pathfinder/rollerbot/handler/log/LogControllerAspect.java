@@ -1,10 +1,6 @@
 package it.pathfinder.rollerbot.handler.log;
 
-import java.util.Arrays;
-import java.util.UUID;
-
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -15,6 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Arrays;
+import java.util.UUID;
+
 
 /*
   Classe che gestisce tramite aspect e spring il logging delle api. Tutti i
@@ -23,8 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Aspect
 @Component
-public class LogControllerAspect
-{
+public class LogControllerAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(LogControllerAspect.class);
 
@@ -55,8 +53,7 @@ public class LogControllerAspect
      */
     @Pointcut("execution(* it.pathfinder.rollerbot.controller.TelegramBotWrapper.* (..))" +
             "&& @annotation(requestMapping)")
-    private void logControllerPointcut(RequestMapping requestMapping)
-    {
+    private void logControllerPointcut(RequestMapping requestMapping) {
         // Non deve fare nulla, serve solo come punto di intervento per i metodi del package controller
     }
 
@@ -65,27 +62,24 @@ public class LogControllerAspect
      * Non deve stampare nel log né le richieste né le risposte
      */
     @Pointcut("execution(* it.pathfinder.rollerbot.webflux.router.*.* (..))")
-    private void logDispatcherPointcut()
-    {
+    private void logDispatcherPointcut() {
         // Non deve fare nulla, serve solo come punto di intervento per i metodi del package telegram
     }
 
     /**
      * Attivato prima dell'esecuzione del metodo
      *
-     * @param joinPoint
-     *            Punto di intervento
+     * @param joinPoint Punto di intervento
      */
     @Before("logControllerPointcut(requestMapping)")
-    public void doBefore(JoinPoint joinPoint, RequestMapping requestMapping)
-    {
+    public void doBefore(JoinPoint joinPoint, RequestMapping requestMapping) {
         String tid = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
         threadId.set(tid);
         logJpSign(requestMapping, joinPoint, STARTMETHOD);
         StringBuilder param = new StringBuilder();
         for (Object arg : joinPoint.getArgs()) {
-            if (arg != null && ! arg.toString().startsWith(TOKENHOLDER)) {
-                if (!StringUtils.isEmpty(param.toString())){
+            if (arg != null && !arg.toString().startsWith(TOKENHOLDER)) {
+                if (!StringUtils.isEmpty(param.toString())) {
                     param.append(" - ");
                 }
                 param.append(arg.toString());
@@ -105,14 +99,11 @@ public class LogControllerAspect
      * e devono poter risalire. Quindi verrà triggerato solamente dal punto di intervento
      * che ascolta il package telegram, altrimenti duplichiamo tutti i log.
      *
-     * @param joinPoint
-     *            Punto di intervento corrispondente
-     * @param ex
-     *            Eccezione
+     * @param joinPoint Punto di intervento corrispondente
+     * @param ex        Eccezione
      */
     @AfterThrowing(pointcut = "logDispatcherPointcut()", throwing = "ex")
-    public void doAfterThrowingDispatcher(JoinPoint joinPoint, Exception ex)
-    {
+    public void doAfterThrowingDispatcher(JoinPoint joinPoint, Exception ex) {
         afterThrowing(joinPoint, ex);
     }
 
@@ -120,13 +111,10 @@ public class LogControllerAspect
      * Metodo generico che gestisce le eccezioni, nel caso volessimo farle stampare da
      * molteplici punti ti intervento.
      *
-     * @param joinPoint
-     *            Punto di intervento corrispondente
-     * @param ex
-     *            Eccezione
+     * @param joinPoint Punto di intervento corrispondente
+     * @param ex        Eccezione
      */
-    private void afterThrowing(JoinPoint joinPoint, Exception ex)
-    {
+    private void afterThrowing(JoinPoint joinPoint, Exception ex) {
         logJpSign(null, joinPoint, ENDMETHODWITHEXCEPTION);
         String jsName = joinPoint.getSignature().getName();
         if (ex != null) {
@@ -141,13 +129,10 @@ public class LogControllerAspect
      * Micrometodo per il log iniziale. Logga con info la signature del
      * joinpoint e il threadid
      *
-     * @param joinPoint
-     *            joinpoint da considerare
-     * @param format
-     *            slf4j log format
+     * @param joinPoint joinpoint da considerare
+     * @param format    slf4j log format
      */
-    private void logJpSign(RequestMapping requestMapping, JoinPoint joinPoint, String format)
-    {
+    private void logJpSign(RequestMapping requestMapping, JoinPoint joinPoint, String format) {
         String sigString = "";
         if (requestMapping != null && !StringUtils.isEmpty(requestMapping.value())) {
             sigString = Arrays.toString(requestMapping.value());

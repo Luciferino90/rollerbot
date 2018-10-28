@@ -7,10 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TelegramUserRepository extends PagingAndSortingRepository<TelegramUser, Long>
-{
-
+public interface TelegramUserRepository extends PagingAndSortingRepository<TelegramUser, Long> {
     Optional<TelegramUser> findTelegramUserByTgId(Long tgId);
+
     Optional<TelegramUser> findTelegramUserByTgUsername(String tgUsername);
 
 }

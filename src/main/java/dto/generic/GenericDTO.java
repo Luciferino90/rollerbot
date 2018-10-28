@@ -10,10 +10,9 @@ import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = false)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-@JsonSubTypes({ @JsonSubTypes.Type(value = GenericResponse.class) })
+@JsonSubTypes({@JsonSubTypes.Type(value = GenericResponse.class)})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class GenericDTO implements Serializable
-{
+public abstract class GenericDTO implements Serializable {
     private static final long serialVersionUID = 20180515_1203L;
 
     @Override

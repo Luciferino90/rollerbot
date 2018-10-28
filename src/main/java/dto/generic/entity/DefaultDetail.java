@@ -1,5 +1,7 @@
-package dto.generic.dices;
+package dto.generic.entity;
 
+import dto.generic.GenericDTO;
+import it.pathfinder.rollerbot.data.entity.Default;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,15 +13,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(callSuper = false)
-public class SingleDiceResponse implements Serializable {
+public class DefaultDetail extends GenericDTO implements Serializable {
 
-    private String result;
-    private String partialResult;
-    private String username;
+    private Default aDefault;
 
     @Override
     public String toString() {
-        return String.format("%s => [%s]: %s", username, partialResult, result);
+        return String.format("%s => %s", aDefault.getName(), aDefault.getCommand());
     }
+
 
 }

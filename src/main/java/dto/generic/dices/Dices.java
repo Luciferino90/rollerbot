@@ -1,9 +1,9 @@
 package dto.generic.dices;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import dto.generic.GenericDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor(force=true)
+@NoArgsConstructor(force = true)
+@EqualsAndHashCode(callSuper = false)
 public class Dices extends GenericDTO implements Serializable {
 
     private String username;
@@ -26,14 +27,12 @@ public class Dices extends GenericDTO implements Serializable {
         this.username = username;
     }
 
-    public void addSingleDiceResponse(SingleDiceResponse singleDiceResponse)
-    {
+    public void addSingleDiceResponse(SingleDiceResponse singleDiceResponse) {
         singleDiceResponseList.add(singleDiceResponse);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return singleDiceResponseList.stream().map(singleDiceResponse -> {
             singleDiceResponse.setUsername(username);
             return singleDiceResponse.toString();
