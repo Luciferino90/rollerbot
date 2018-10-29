@@ -1,13 +1,13 @@
 package it.pathfinder.rollerbot.telegram;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class TelegramBotFallback extends TelegramLongPollingBot {
-    private static Logger logger = LogManager.getLogger();
+    private static Logger logger = LoggerFactory.getLogger(TelegramLongPollingBot.class);
     WebClient client = WebClient.create();
     private String token;
     private TelegramBot telegramBot;
