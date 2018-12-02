@@ -7,8 +7,11 @@ import dto.request.custom.Request;
 import dto.response.generic.ResponseList;
 import it.pathfinder.rollerbot.data.entity.Custom;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
+import it.pathfinder.rollerbot.exception.CustomNotFoundException;
+import it.pathfinder.rollerbot.exception.TgUserNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,24 +23,25 @@ import java.util.stream.Collectors;
 public class CustomController extends BasicController implements DaoController {
 
     @Override
-    public GenericDTO set(ServerRequest serverRequest) {
-        Request request = readRequest(serverRequest);
-        Optional<Custom> res = customService.setIfNotExists(request.getTgOid(), request.getName(), request.getValue());
-
-        return res.<GenericDTO>map(CustomDetail::new)
-                .orElseGet(() ->
-                        new Error("CustomFormula already present: " + request.getName() + ". Use reset to overwrite, or delete to remove it."));
+    public Mono<GenericDTO> get(Request request) {
+        return Mono.just(request)
+                    .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(()-> new TgUserNotFoundException("User not found: " + req.getTgOid())))
+                    .map(user -> customService.findByUserAndCustomNameAndPathfinderPg(user, request.getName(), user.getDefaultPathfinderPg()).orElseThrow(()-> new TgUserNotFoundException("Custom not found for " + request.getName() + " and " + user.getDefaultPathfinderPg().getName())))
+                    .map(CustomDetail::new);
     }
 
     @Override
-    public GenericDTO reset(ServerRequest serverRequest) {
-        Request request = readRequest(serverRequest);
-        Optional<Custom> res = customService.overwriteIfExists(request.getTgOid(), request.getName(), request.getValue());
+    public Mono<GenericDTO> set(Request request) {
+        return Mono.just(request)
+                .map(req -> customService.setIfNotExists(req.getTgOid(), req.getName(), req.getValue()).orElseThrow(() -> new CustomNotFoundException("CustomFormula already present: " + req.getName() + ". Use reset to overwrite, or delete to remove it.")))
+                .map(CustomDetail::new);
+    }
 
-        return res.<GenericDTO>map(CustomDetail::new)
-                .orElseGet(() ->
-                        new Error("CustomFormula set failed: " + request.getName() + ". Please try again later."));
-
+    @Override
+    public Mono<GenericDTO> reset(Request request) {
+        return Mono.just(request)
+                .map(req -> customService.overwriteIfExists(req.getTgOid(), req.getName(), req.getValue()).orElseThrow(() -> new CustomNotFoundException("CustomFormula set failed: " + request.getName() + ". Please try again later.")))
+                .map(CustomDetail::new);
     }
 
     @Override
@@ -48,24 +52,6 @@ public class CustomController extends BasicController implements DaoController {
         return res.<GenericDTO>map(CustomDetail::new)
                 .orElseGet(() ->
                         new Error("CustomFormula delete failed: " + request.getName() + ". Please try again later."));
-    }
-
-    @Override
-    public GenericDTO get(ServerRequest serverRequest) {
-        Request request = readRequest(serverRequest);
-        TelegramUser telegramUser = telegramUserService.findByTgOid(request.getTgOid()).orElse(null);
-
-        if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
-            return new Error("User not registered");
-        if (!customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg()).isPresent())
-            return new Error("No var found for var " + request.getName() + " tgUser " + telegramUser.getTgUsername() +
-                    (telegramUser.getDefaultPathfinderPg() != null ? String.format(" and character name %s", telegramUser.getDefaultPathfinderPg().getName()) : ""));
-
-        Optional<Custom> res = customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, request.getName(), telegramUser.getDefaultPathfinderPg());
-
-        return res.<GenericDTO>map(CustomDetail::new)
-                .orElseGet(() ->
-                        new Error("CustomFormula not found: " + request.getName() + "."));
     }
 
     @Override

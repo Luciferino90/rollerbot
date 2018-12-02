@@ -1,6 +1,7 @@
 package it.pathfinder.rollerbot.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dto.generic.GenericDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TelegramUser implements Serializable {
+public class TelegramUser extends GenericDTO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
