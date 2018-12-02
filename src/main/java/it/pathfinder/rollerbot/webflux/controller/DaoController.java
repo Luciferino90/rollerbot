@@ -1,18 +1,19 @@
 package it.pathfinder.rollerbot.webflux.controller;
 
 import dto.generic.GenericDTO;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import dto.request.custom.Request;
+import reactor.core.publisher.Mono;
 
 public interface DaoController {
 
-    GenericDTO set(ServerRequest serverRequest);
+    Mono<GenericDTO> set(Request request);
 
-    GenericDTO reset(ServerRequest serverRequest);
+    Mono<GenericDTO> reset(Request request);
 
-    GenericDTO delete(ServerRequest serverRequest);
+    Mono<GenericDTO> delete(Request request);
 
-    GenericDTO get(ServerRequest serverRequest);
+    Mono<GenericDTO> get(Request request);
 
-    GenericDTO list(ServerRequest serverRequest);
+    Mono<GenericDTO> list(Request request);
 
 }

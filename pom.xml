@@ -12,7 +12,6 @@
 
     <properties>
         <lombok.version>1.18.2</lombok.version>
-        <reactor.version>3.2.0.RELEASE</reactor.version>
         <apache-commons-lang.version>3.8.1</apache-commons-lang.version>
         <aspectj.version>1.9.1</aspectj.version>
         <janino.version>2.5.10</janino.version>
@@ -64,7 +63,6 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>${reactor.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -139,6 +137,18 @@
             <version>${activation.version}</version>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-bom</artifactId>
+                <version>Bismuth-RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
         <repository>

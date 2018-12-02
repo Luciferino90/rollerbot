@@ -6,12 +6,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PathfinderPgRepository extends PagingAndSortingRepository<PathfinderPg, Long> {
 
-    PathfinderPg findByNameAndTelegramUser(String name, TelegramUser telegramUser);
+    Optional<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser);
 
-    List<PathfinderPg> findAllByTelegramUser(TelegramUser telegramUser);
+    Optional<List<PathfinderPg>> findAllByTelegramUser(TelegramUser telegramUser);
 
 }

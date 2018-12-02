@@ -17,7 +17,7 @@ public interface CustomRepository extends PagingAndSortingRepository<Custom, Lon
     Optional<Custom> findByCustomNameAndTelegramUserAndPathfinderPg(String customName, TelegramUser telegramUser,
                                                                     PathfinderPg pathfinderPg);
 
-    List<Custom> findByTelegramUser(TelegramUser telegramUser);
+    Optional<List<Custom>> findByTelegramUser(TelegramUser telegramUser);
 
-    List<Custom> findByPathfinderPg(PathfinderPg pathfinderPg);
+    Optional<List<Custom>> findByPathfinderPg(PathfinderPg pathfinderPg);
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface TelegramUserRepository extends PagingAndSortingRepository<TelegramUser, Long> {
+
     Optional<TelegramUser> findTelegramUserByTgId(Long tgId);
 
     Optional<TelegramUser> findTelegramUserByTgUsername(String tgUsername);

@@ -4,11 +4,12 @@ import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.Stats;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.StatsRepository;
+import it.pathfinder.rollerbot.exception.StatsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,14 +21,14 @@ public class StatsService {
     @Autowired
     private PathfinderPgService pathfinderPgService;
 
-    public Stats findByCharacter(PathfinderPg pathfinderPg) {
+    public Optional<Stats> findByCharacter(PathfinderPg pathfinderPg) {
         return statsRepository.findAllByPathfinderPg(pathfinderPg);
     }
 
     public List<Stats> list(TelegramUser telegramUser) {
         return pathfinderPgService.list(telegramUser)
-                .stream().map(pathfinderPg -> statsRepository.findAllByPathfinderPg(pathfinderPg))
-                .filter(Objects::nonNull)
+                .stream().map(pathfinderPg -> statsRepository.findAllByPathfinderPg(pathfinderPg)
+                    .orElseThrow(() -> new StatsException("No stats found for " + pathfinderPg.getName())))
                 .collect(Collectors.toList());
     }
 
@@ -36,9 +37,7 @@ public class StatsService {
     }
 
     public Stats set(PathfinderPg pathfinderPg, String name, Integer value) {
-        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg);
-        if (stat == null)
-            stat = new Stats(pathfinderPg);
+        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(new Stats(pathfinderPg));
         switch (name.toUpperCase()) {
             case "HP":
                 stat.setHp(value);
@@ -93,9 +92,7 @@ public class StatsService {
     }
 
     public Integer get(PathfinderPg pathfinderPg, String name) {
-        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg);
-        if (stat == null)
-            stat = new Stats();
+        Stats stat = statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(new Stats());
         switch (name.toUpperCase()) {
             case "HP":
                 return stat.getHp();

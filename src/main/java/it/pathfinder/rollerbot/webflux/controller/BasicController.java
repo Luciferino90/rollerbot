@@ -28,12 +28,14 @@ public class BasicController {
     @Autowired
     DefaultService defaultService;
 
+    /*
     protected Request readRequest(ServerRequest serverRequest) {
         Long tgOid = Long.parseLong(serverRequest.queryParam("tgOid").orElse(""));
         String name = serverRequest.pathVariables().containsKey("name") ? serverRequest.pathVariable("name") : null;
         String value = serverRequest.pathVariables().containsKey("value") ? serverRequest.pathVariable("value") : null;
         return new Request(tgOid, name, value);
     }
+    */
 
 
 }

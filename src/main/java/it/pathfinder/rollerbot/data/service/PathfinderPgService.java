@@ -4,10 +4,12 @@ import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.Stats;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.PathfinderPgRepository;
+import it.pathfinder.rollerbot.exception.PathfinderPgException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PathfinderPgService {
@@ -36,13 +38,11 @@ public class PathfinderPgService {
     }
 
     public PathfinderPg reset(String username, TelegramUser user) {
-        PathfinderPg pathfinderPg = findByNameAndTelegramUser(username, user);
+        PathfinderPg pathfinderPg = findByNameAndTelegramUser(username, user).orElse(null);
         if (pathfinderPg == null)
             return set(username, user);
         else {
-            Stats stat = statsService.findByCharacter(pathfinderPg);
-            if (stat == null)
-                stat = new Stats(pathfinderPg);
+            Stats stat = statsService.findByCharacter(pathfinderPg).orElse(new Stats(pathfinderPg));
             stat.init();
             statsService.save(stat);
         }
@@ -57,19 +57,20 @@ public class PathfinderPgService {
         return pathfinderPgRepository.findById(oid).orElse(null);
     }
 
-    public PathfinderPg findByNameAndTelegramUser(String name, TelegramUser telegramUser) {
+    public Optional<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser) {
         return pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser);
     }
 
-    public PathfinderPg delete(String name, TelegramUser telegramUser) {
-        PathfinderPg pathfinderPg = findByNameAndTelegramUser(name, telegramUser);
+    public Optional<PathfinderPg> delete(String name, TelegramUser telegramUser) {
+        PathfinderPg pathfinderPg = findByNameAndTelegramUser(name, telegramUser)
+                .orElseThrow(() -> new PathfinderPgException("No character found for user " + telegramUser.getTgUsername() + " and name " + name));
         if (telegramUser.getDefaultPathfinderPg() != null &&
                 telegramUser.getDefaultPathfinderPg().getId().equals(pathfinderPg.getId()))
             telegramUserService.setDefault(telegramUser, null);
         if (customService.findByPathfinderPg(pathfinderPg).isPresent())
             customService.findByPathfinderPg(pathfinderPg).get().forEach(cs -> customService.delete(cs));
         pathfinderPgRepository.delete(pathfinderPg);
-        return pathfinderPg;
+        return Optional.of(pathfinderPg);
     }
 
     public List<PathfinderPg> list(TelegramUser telegramUser) {

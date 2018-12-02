@@ -4,6 +4,7 @@ import it.pathfinder.rollerbot.data.entity.Custom;
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.CustomRepository;
+import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,15 +42,15 @@ public class CustomService {
     }
 
     public Optional<Custom> overwriteIfExists(Long tgOid, String customName, String customValue) {
-        TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElse(null);
-        if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
-            return Optional.empty();
+        TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElseThrow(() -> new TelegramUserException("No telegram user found for " + tgOid));
+
         Custom custom = findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg())
                 .orElse(new Custom());
 
         custom.setTelegramUser(telegramUser);
         custom.setCustomName(customName);
         custom.setCustomValue(customValue);
+
         return Optional.of(customRepository.save(custom));
     }
 
@@ -59,22 +60,20 @@ public class CustomService {
     }
 
     public Optional<Custom> delete(Long tgOid, String customName) {
-        TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElse(null);
-        if (Objects.requireNonNull(telegramUser).getDefaultPathfinderPg() == null)
-            return Optional.empty();
+        TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElseThrow(() -> new TelegramUserException("No telegram user found for " + tgOid));
+        Custom customThrows = findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg())
+                .orElseThrow(()-> new TelegramUserException("Custom not found for " + customName + " and " + telegramUser.getDefaultPathfinderPg().getName()));
+        customRepository.delete(customThrows);
 
-        Optional<Custom> customThrows = findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg());
-        customThrows.ifPresent(customThrows1 -> customRepository.delete(customThrows1));
-        return customThrows;
+        return Optional.of(customThrows);
     }
 
     public Optional<List<Custom>> findByUserOid(Long tgOid) {
-        TelegramUser telegramUser = telegramUserService.findByTgOid(tgOid).orElse(null);
-        return Optional.of(customRepository.findByTelegramUser(telegramUser));
+        return customRepository.findByTelegramUser(telegramUserService.findByTgOid(tgOid).orElseThrow(()-> new TelegramUserException("User not found: " + tgOid)));
     }
 
     public Optional<List<Custom>> findByPathfinderPg(PathfinderPg pathfinderPg) {
-        return Optional.of(customRepository.findByPathfinderPg(pathfinderPg));
+        return customRepository.findByPathfinderPg(pathfinderPg);
     }
 
 }
