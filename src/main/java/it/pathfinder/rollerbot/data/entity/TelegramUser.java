@@ -2,9 +2,7 @@ package it.pathfinder.rollerbot.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dto.generic.GenericDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +13,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = false)
 public class TelegramUser extends GenericDTO implements Serializable {
 
     @Id

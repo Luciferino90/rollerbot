@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -40,15 +41,14 @@ public class DefaultController extends BasicController implements DaoController 
     @Override
     public Mono<GenericDTO> get(Request request) {
         return Mono.just(request)
-                .map(req -> defaultService.get(req.getName()).orElseThrow(() -> new DefaultException("Default formula: " + request.getName() + " not found.")))
+                .flatMap(req -> defaultService.get(req.getName()))
                 .map(DefaultDetail::new);
     }
 
     @Override
-    public Mono<GenericDTO> list(Request request) {
-        return Mono.just(request)
-                .map(req -> defaultService.findAll().orElseThrow(() -> new DefaultException("No default found")))
-                .map(defaults -> new ResponseList(defaults.stream().map(DefaultDetail::new).collect(Collectors.toList())));
+    public Flux<GenericDTO> list(Request request) {
+        return defaultService.findAll()
+                .map(DefaultDetail::new);
     }
 
 }

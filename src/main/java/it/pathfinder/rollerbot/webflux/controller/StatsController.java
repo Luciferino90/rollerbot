@@ -9,6 +9,7 @@ import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.stream.Collectors;
@@ -20,26 +21,23 @@ public class StatsController extends BasicController implements DaoController {
 
     @Override
     public Mono<GenericDTO> set(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> statsService.set(telegramUser.getDefaultPathfinderPg(), request.getName(), Integer.valueOf(request.getValue())))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> statsService.set(telegramUser.getDefaultPathfinderPg(), request.getName(), Integer.valueOf(request.getValue())))
                 .map(StatsDetail::new);
     }
 
     @Override
     public Mono<GenericDTO> get(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> statsService.findByCharacter(telegramUser.getDefaultPathfinderPg())
-                        .orElseThrow(() -> new StatsException("No stats found for " + telegramUser.getDefaultPathfinderPg().getName())))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> statsService.findByCharacter(telegramUser.getDefaultPathfinderPg()))
                 .map(StatsDetail::new);
     }
-
+    
     @Override
-    public Mono<GenericDTO> list(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> new ResponseList(statsService.list(telegramUser).stream().map(StatsDetail::new).collect(Collectors.toList())));
+    public Flux<GenericDTO> list(Request request) {
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMapMany(telegramUser -> statsService.list(telegramUser))
+                .map(StatsDetail::new);
     }
 
     @Override

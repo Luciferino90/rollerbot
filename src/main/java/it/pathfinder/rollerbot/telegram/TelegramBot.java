@@ -45,7 +45,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom());
+        TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom()).block();
         String queryParam = "?tgOid=" + telegramUser.getTgId();
         try {
             GenericResponse response = webClient.get()

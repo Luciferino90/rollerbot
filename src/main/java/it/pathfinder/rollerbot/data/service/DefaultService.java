@@ -2,9 +2,12 @@ package it.pathfinder.rollerbot.data.service;
 
 import it.pathfinder.rollerbot.data.entity.Default;
 import it.pathfinder.rollerbot.data.repository.DefaultRepository;
+import it.pathfinder.rollerbot.exception.DefaultException;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +18,14 @@ public class DefaultService {
     @Autowired
     private DefaultRepository defaultRepository;
 
-    public Optional<Default> get(String name) {
-        return Optional.of(defaultRepository.findDefaultByName(name));
+    public Mono<Default> get(String name) {
+        return defaultRepository.findDefaultByName(name)
+                .switchIfEmpty(Mono.error(new DefaultException("Default formula: " + name + " not found.")));
     }
 
-    public Optional<List<Default>> findAll() {
-        return Optional.of(IteratorUtils.toList(defaultRepository.findAll().iterator()));
+    public Flux<Default> findAll() {
+        return defaultRepository.findAll()
+                .switchIfEmpty(Flux.error(new DefaultException("No default found")));
     }
 
 }

@@ -10,6 +10,7 @@ import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
@@ -22,61 +23,53 @@ public class PathfinderPgController extends BasicController implements DaoContro
 
     @Override
     public Mono<GenericDTO> set(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser)
-                        .orElseThrow(() -> new PathfinderPgException("No character found for user " + telegramUser.getTgUsername() + " and name " + request.getName())))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser))
                 .map(PathfinderPgDetail::new);
     }
 
     @Override
     public Mono<GenericDTO> reset(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> pathfinderPgService.set(request.getName(), telegramUser))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> pathfinderPgService.set(request.getName(), telegramUser))
                 .map(PathfinderPgDetail::new);
     }
 
     @Override
     public Mono<GenericDTO> get(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser)
-                        .orElseThrow(() -> new PathfinderPgException("No pathfinder pg found for telegram user " + telegramUser.getTgUsername() + " and name " +request.getName())))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser))
                 .map(PathfinderPgDetail::new);
     }
 
     @Override
     public Mono<GenericDTO> delete(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> pathfinderPgService.delete(request.getName(), telegramUser)
-                        .orElseThrow(() -> new PathfinderPgException("No pathfinder pg found for telegram user " + telegramUser.getTgUsername() + " and name " +request.getName())))
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> pathfinderPgService.delete(request.getName(), telegramUser))
                 .map(PathfinderPgDetail::new);
     }
 
     @Override
-    public Mono<GenericDTO> list(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> new ResponseList(pathfinderPgService.list(telegramUser).stream().map(PathfinderPgDetail::new).collect(Collectors.toList())));
-    }
-
-    public Mono<GenericDTO> defaultCharacter(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(TelegramUser::getDefaultPathfinderPg)
-                    .switchIfEmpty(Mono.error(new PathfinderPgException("No default pathfinder pg found")))
+    public Flux<GenericDTO> list(Request request) {
+        return telegramUserService.findByTgOid(request.getTgOid())
+                .flatMapMany(telegramUser -> pathfinderPgService.list(telegramUser))
                 .map(PathfinderPgDetail::new);
     }
 
-    public Mono<GenericDTO> useCharacter(Request request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(req.getTgOid()).orElseThrow(() -> new TelegramUserException("No telegram user found for oid " + req.getTgOid())))
-                .map(telegramUser -> Tuples.of(telegramUser, pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser)
-                        .orElseThrow(() -> new PathfinderPgException("No character found for user " + telegramUser.getTgUsername() + " and name " + request.getName()))))
-                .map(tuple2 -> telegramUserService.setDefault(tuple2.getT1(), tuple2.getT2()))
+    public Mono<GenericDTO> defaultCharacter(Request request) {
+        return telegramUserService.findByTgOid(request.getTgOid())
                 .map(TelegramUser::getDefaultPathfinderPg)
+                    .switchIfEmpty(Mono.error(new PathfinderPgException("No default pathfinder pg found")))
+                    .map(PathfinderPgDetail::new);
+    }
+
+    public Mono<GenericDTO> useCharacter(Request request) {
+        return  telegramUserService.findByTgOid(request.getTgOid())
+                .flatMap(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser))
+                .flatMap(pathfinderPg -> telegramUserService.findByTgOid(request.getTgOid()).map(telegramUser -> {
+                    telegramUser.setDefaultPathfinderPg(pathfinderPg);
+                    return pathfinderPg;
+                }))
                 .map(PathfinderPgDetail::new);
     }
 

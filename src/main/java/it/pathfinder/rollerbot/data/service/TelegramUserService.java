@@ -3,10 +3,12 @@ package it.pathfinder.rollerbot.data.service;
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.TelegramUserRepository;
+import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.objects.User;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.Optional;
@@ -17,50 +19,49 @@ public class TelegramUserService {
     @Autowired
     private TelegramUserRepository telegramUserRepository;
 
-    public TelegramUser findOrRegister(User user) {
-        Optional<TelegramUser> telegramUser = findByUser(user);
-        return telegramUser.orElse(registerUser(user));
+    public Mono<TelegramUser> findOrRegister(User user) {
+        return findByUser(user)
+                .switchIfEmpty(registerUser(user));
     }
 
-    public Optional<TelegramUser> findByUser(User user) {
-        if (user.getId() != null)
-            return telegramUserRepository.findTelegramUserByTgId(user.getId().longValue());
-        else if (!StringUtils.isEmpty(user.getUserName()))
-            return telegramUserRepository.findTelegramUserByTgUsername(user.getUserName());
-        else
-            return Optional.empty();
+    public Mono<TelegramUser> findByUser(User user) {
+        return Mono.just(user)
+                .flatMap(u ->
+                        u.getId() != null
+                                ? telegramUserRepository.findTelegramUserByTgId(user.getId().longValue())
+                                : !StringUtils.isEmpty(u.getUserName())
+                                    ? telegramUserRepository.findTelegramUserByTgUsername(user.getUserName())
+                                        : Mono.empty()
+                );
     }
 
-    public Optional<TelegramUser> findByTgOid(Long tgOid) {
-        return telegramUserRepository.findTelegramUserByTgId(tgOid);
+    public Mono<TelegramUser> findByTgOid(Long tgOid) {
+        return telegramUserRepository.findTelegramUserByTgId(tgOid)
+                .switchIfEmpty(Mono.error(new TelegramUserException("No telegram user found for " + tgOid)));
     }
 
-    public TelegramUser registerUser(User user) {
-        TelegramUser telegramUser = telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId()))
-                .orElse(createNewUser(user));
-
-        telegramUser.setTgName(user.getFirstName());
-        telegramUser.setTgSurname(user.getLastName());
-        telegramUser.setTgUsername(user.getUserName());
-        return telegramUserRepository.save(telegramUser);
+    public Mono<TelegramUser> registerUser(User user) {
+        return telegramUserRepository.findTelegramUserByTgId(Long.valueOf(user.getId())).switchIfEmpty(createNewUser(user))
+            .map(telegramUser -> TelegramUser.builder().tgName(user.getFirstName()).tgSurname(user.getLastName()).tgUsername(user.getUserName()).build())
+                .flatMap(telegramUser -> telegramUserRepository.save(telegramUser));
     }
 
-    private TelegramUser createNewUser(User user) {
-        TelegramUser telegramUser = new TelegramUser();
-        telegramUser.setRegisterDate(new Date());
-        telegramUser.setTgId(user.getId().longValue());
-        return telegramUser;
+    private Mono<TelegramUser> createNewUser(User user) {
+        return Mono.just(new TelegramUser())
+                .map(telegramUser -> TelegramUser.builder().registerDate(new Date()).tgId(user.getId().longValue()).build());
     }
 
-    public TelegramUser createAnonUser() {
-        TelegramUser telegramUser = new TelegramUser();
-        telegramUser.setTgUsername("anonymous");
-        return telegramUser;
+    public Mono<TelegramUser> createAnonUser() {
+        return Mono.just(new TelegramUser())
+                .map(telegramUser -> TelegramUser.builder().tgUsername("anonymous").build());
     }
 
-    public TelegramUser setDefault(TelegramUser telegramUser, PathfinderPg pathfinderPg) {
-        telegramUser.setDefaultPathfinderPg(pathfinderPg);
-        return telegramUserRepository.save(telegramUser);
+    public Mono<TelegramUser> setDefault(TelegramUser telegramUser, PathfinderPg pathfinderPg) {
+        return Mono.just(telegramUser)
+                .flatMap(tgUser -> {
+                    telegramUser.setDefaultPathfinderPg(pathfinderPg);
+                    return telegramUserRepository.save(telegramUser);
+                });
     }
 
 }

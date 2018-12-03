@@ -1,8 +1,10 @@
 package it.pathfinder.rollerbot.webflux.handler;
 
+import dto.request.custom.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -14,35 +16,70 @@ public class PathfinderPgHandler extends BasicHandler implements DaoHandler {
 
     @Override
     public Mono<ServerResponse> set(ServerRequest serverRequest) {
-        return response(pathfinderPgController.set(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.set(request))));
     }
 
     @Override
     public Mono<ServerResponse> reset(ServerRequest serverRequest) {
-        return response(pathfinderPgController.reset(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.reset(request))));
     }
 
     @Override
     public Mono<ServerResponse> get(ServerRequest serverRequest) {
-        return response(pathfinderPgController.get(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.get(request))));
     }
 
     @Override
     public Mono<ServerResponse> delete(ServerRequest serverRequest) {
-        return response(pathfinderPgController.delete(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.delete(request))));
     }
 
     @Override
     public Mono<ServerResponse> list(ServerRequest serverRequest) {
-        return response(pathfinderPgController.list(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.list(request))));
     }
 
     public Mono<ServerResponse> defaultCharacter(ServerRequest serverRequest) {
-        return response(pathfinderPgController.defaultCharacter(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.defaultCharacter(request))));
     }
 
     public Mono<ServerResponse> useCharacter(ServerRequest serverRequest) {
-        return response(pathfinderPgController.useCharacter(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(pathfinderPgController.useCharacter(request))));
     }
 
 }

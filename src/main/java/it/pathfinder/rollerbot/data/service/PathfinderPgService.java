@@ -7,7 +7,11 @@ import it.pathfinder.rollerbot.data.repository.PathfinderPgRepository;
 import it.pathfinder.rollerbot.exception.PathfinderPgException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
+import javax.persistence.Tuple;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,54 +30,66 @@ public class PathfinderPgService {
     @Autowired
     private StatsService statsService;
 
-    public PathfinderPg set(String username, TelegramUser user) {
-        PathfinderPg pathfinderPg = new PathfinderPg();
-        pathfinderPg.setName(username);
-        pathfinderPg.setTelegramUser(user);
-        pathfinderPg = save(pathfinderPg);
-        if (user.getDefaultPathfinderPg() == null)
-            telegramUserService.setDefault(user, pathfinderPg);
-        statsService.save(new Stats(pathfinderPg));
-        return pathfinderPg;
+    public Mono<PathfinderPg> set(String username, TelegramUser user) {
+        return save(PathfinderPg.builder().name(username).telegramUser(user).build())
+                .map(pathfinderPg -> {
+                    if (user.getDefaultPathfinderPg() == null)
+                        telegramUserService.setDefault(user, pathfinderPg);
+                    return pathfinderPg;
+                });
     }
 
-    public PathfinderPg reset(String username, TelegramUser user) {
-        PathfinderPg pathfinderPg = findByNameAndTelegramUser(username, user).orElse(null);
-        if (pathfinderPg == null)
-            return set(username, user);
-        else {
-            Stats stat = statsService.findByCharacter(pathfinderPg).orElse(new Stats(pathfinderPg));
-            stat.init();
-            statsService.save(stat);
-        }
-        return pathfinderPg;
+    public Mono<PathfinderPg> reset(String username, TelegramUser user) {
+        return findByNameAndTelegramUser(username, user)
+                .map(pathfinderPg -> {
+                    statsService.findByCharacter(pathfinderPg)
+                            .map(stats -> {
+                                stats.init();
+                                return stats;
+                            })
+                            .flatMap(stats -> statsService.save(stats));
+                    return pathfinderPg;
+                })
+                .switchIfEmpty(set(username, user));
     }
 
-    private PathfinderPg save(PathfinderPg pathfinderPg) {
+    private Mono<PathfinderPg> save(PathfinderPg pathfinderPg) {
         return pathfinderPgRepository.save(pathfinderPg);
     }
 
-    public PathfinderPg findByOid(Long oid) {
-        return pathfinderPgRepository.findById(oid).orElse(null);
+    public Mono<PathfinderPg> findByOid(Long oid) {
+        return pathfinderPgRepository.findById(oid).switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by id " + oid)));
     }
 
-    public Optional<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser) {
-        return pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser);
+    public Mono<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser) {
+        return pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser).switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by name " + name)));
     }
 
-    public Optional<PathfinderPg> delete(String name, TelegramUser telegramUser) {
-        PathfinderPg pathfinderPg = findByNameAndTelegramUser(name, telegramUser)
-                .orElseThrow(() -> new PathfinderPgException("No character found for user " + telegramUser.getTgUsername() + " and name " + name));
-        if (telegramUser.getDefaultPathfinderPg() != null &&
-                telegramUser.getDefaultPathfinderPg().getId().equals(pathfinderPg.getId()))
-            telegramUserService.setDefault(telegramUser, null);
-        if (customService.findByPathfinderPg(pathfinderPg).isPresent())
-            customService.findByPathfinderPg(pathfinderPg).get().forEach(cs -> customService.delete(cs));
-        pathfinderPgRepository.delete(pathfinderPg);
-        return Optional.of(pathfinderPg);
+    public Mono<PathfinderPg> delete(String name, TelegramUser telegramUser) {
+        return findByNameAndTelegramUser(name, telegramUser)
+                .map(pathfinderPg -> {
+                    if (telegramUser.getDefaultPathfinderPg() != null &&
+                            telegramUser.getDefaultPathfinderPg().getId().equals(pathfinderPg.getId()))
+                        telegramUserService.setDefault(telegramUser, null);
+                    return pathfinderPg;
+                })
+                .map(pathfinderPg -> {
+                    customService.findByPathfinderPg(pathfinderPg)
+                            .map(custom -> customService.delete(custom));
+                    return pathfinderPg;
+                })
+                .map(pathfinderPg -> {
+                    statsService.findByCharacter(pathfinderPg)
+                            .map(stats -> statsService.delete(stats));
+                    return pathfinderPg;
+                })
+                .map(pathfinderPg -> {
+                    pathfinderPgRepository.delete(pathfinderPg);
+                    return pathfinderPg;
+                });
     }
 
-    public List<PathfinderPg> list(TelegramUser telegramUser) {
+    public Flux<PathfinderPg> list(TelegramUser telegramUser) {
         return pathfinderPgRepository.findAllByTelegramUser(telegramUser);
     }
 

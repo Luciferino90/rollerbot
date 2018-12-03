@@ -26,21 +26,41 @@ public class CustomHandler extends BasicHandler implements DaoHandler {
 
     @Override
     public Mono<ServerResponse> set(ServerRequest serverRequest) {
-        return response(customController.set(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(customController.set(request))));
     }
 
     @Override
     public Mono<ServerResponse> reset(ServerRequest serverRequest) {
-        return response(customController.reset(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(customController.reset(request))));
     }
 
     @Override
     public Mono<ServerResponse> delete(ServerRequest serverRequest) {
-        return response(customController.delete(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(customController.delete(request))));
     }
 
     @Override
     public Mono<ServerResponse> list(ServerRequest serverRequest) {
-        return response(customController.list(serverRequest));
+        return serverRequest
+                .bodyToMono(Request.class)
+                .flatMap(request ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(customController.list(request))));
     }
 }

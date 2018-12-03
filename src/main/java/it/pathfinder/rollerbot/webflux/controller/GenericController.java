@@ -21,8 +21,8 @@ public class GenericController extends BasicController {
     private VariablesService variablesService;
 
     public Mono<GenericDTO> diceRoller(ServerRequest request) {
-        return Mono.just(request)
-                .map(req -> telegramUserService.findByTgOid(Long.parseLong(req.queryParam("tgOid").orElse("0"))).orElse(telegramUserService.createAnonUser()))
+        return telegramUserService.findByTgOid(Long.parseLong(request.queryParam("tgOid").orElse("0")))
+                        .doOnError( e -> telegramUserService.createAnonUser())
                 .map(telegramUser -> Tuples.of(telegramUser, variablesService.manageStrings(telegramUser, request.pathVariable("expression"))))
                 .map(tuple2 -> {
                     logger.info("@{}: {}", tuple2.getT1().getTgUsername(), tuple2.getT2());

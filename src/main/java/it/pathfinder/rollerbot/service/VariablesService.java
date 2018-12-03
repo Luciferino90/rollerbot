@@ -10,6 +10,7 @@ import it.pathfinder.rollerbot.data.service.StatsService;
 import it.pathfinder.rollerbot.utility.PrivateNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 public class VariablesService {
@@ -56,11 +58,8 @@ public class VariablesService {
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        List<String> customList = customService.findByPathfinderPg(telegramUser.getDefaultPathfinderPg())
-                .stream()
-                .flatMap(customs -> customs
-                        .stream()
-                        .map(Custom::getCustomName))
+        List<String> customList = customService.findByPathfinderPg(telegramUser.getDefaultPathfinderPg()).toStream()
+                .map(Custom::getCustomName)
                 .collect(Collectors.toList());
 
         List<String> vars = Stream.concat(
@@ -96,8 +95,8 @@ public class VariablesService {
     }
 
     private String replacingDefault(String key, String expression) {
-        Optional<Default> defaultObj = defaultService.get(key);
-        return defaultObj.map(aDefault -> expression.replace(key, aDefault.getCommand())).orElse(expression);
+        Mono<Default> defaultObj = defaultService.get(key);
+        return defaultObj.map(aDefault -> expression.replace(key, aDefault.getCommand())).defaultIfEmpty(expression).block();
     }
 
     private String replacingStats(String key, String expression, PathfinderPg pathfinderPg) {
@@ -105,8 +104,8 @@ public class VariablesService {
     }
 
     private String replacingCustom(String expression, String key, TelegramUser telegramUser) {
-        Optional<Custom> custom = customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, key, telegramUser.getDefaultPathfinderPg());
-        return custom.map(custom1 -> expression.replace(key, custom1.getCustomValue())).orElse(expression);
+        Mono<Custom> custom = customService.findByUserAndCustomNameAndPathfinderPg(telegramUser, key, telegramUser.getDefaultPathfinderPg());
+        return custom.map(custom1 -> expression.replace(key, custom1.getCustomValue())).defaultIfEmpty(expression).block();
     }
 
 }

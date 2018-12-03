@@ -13,7 +13,7 @@ public class GenericHandler extends BasicHandler {
     private Logger logger = LoggerFactory.getLogger(GenericHandler.class);
 
     public Mono<ServerResponse> diceRoller(ServerRequest serverRequest) {
-        return response(genericController.diceRoller(serverRequest));
+        return response(genericController.diceRoller(serverRequest).block());
     }
 
 }
