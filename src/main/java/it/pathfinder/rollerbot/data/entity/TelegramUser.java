@@ -30,15 +30,16 @@ public class TelegramUser extends GenericDTO implements Serializable {
     private Long tgId;
     private String email;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToOne
-    @ToStringExclude
-    @HashCodeExclude
     @JoinColumn(name = "default_pathfinder_id")
     private PathfinderPg defaultPathfinderPg;
 
+
     @OneToMany(fetch = FetchType.LAZY)
-    @ToStringExclude
-    @HashCodeExclude
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<PathfinderPg> pathfinderPgList;
 
 }

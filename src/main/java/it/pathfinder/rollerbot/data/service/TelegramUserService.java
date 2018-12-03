@@ -45,25 +45,19 @@ public class TelegramUserService {
     @Transactional
     public Mono<TelegramUser> registerUser(User user) {
         return findTelegramUserByTgId(Long.valueOf(user.getId()))
-                .switchIfEmpty(createNewUser(user))
-            .map(telegramUser -> TelegramUser.builder()
-                                    .tgName(user.getFirstName())
-                                    .tgSurname(user.getLastName())
-                                    .tgUsername(user.getUserName())
-                                    .build())
-                .flatMap(telegramUser -> {
-                    System.out.println("Prova");
-                    return Mono.just(telegramUserRepository.save(telegramUser));
-                });
+                .switchIfEmpty(createNewUser(user));
     }
 
     private Mono<TelegramUser> createNewUser(User user) {
         return Mono.just(new TelegramUser())
                 .map(telegramUser -> TelegramUser
                         .builder()
+                        .tgName(user.getFirstName())
+                        .tgSurname(user.getLastName())
+                        .tgUsername(user.getUserName())
                         .registerDate(new Date())
-                        .tgId(user.getId().longValue())
-                        .build());
+                        .build())
+                .map(telegramUser -> telegramUserRepository.save(telegramUser));
     }
 
     public Mono<TelegramUser> createAnonUser() {
@@ -80,11 +74,7 @@ public class TelegramUserService {
     }
 
     public Mono<TelegramUser> findTelegramUserByTgId(Long id){
-        Optional<TelegramUser> tgUser = telegramUserRepository.findTelegramUserByTgId(id);
-        if (tgUser.isPresent())
-            return Mono.just(tgUser.get());
-        else
-            return Mono.empty();
+        return Mono.justOrEmpty(telegramUserRepository.findTelegramUserByTgId(id));
     }
 
 }
