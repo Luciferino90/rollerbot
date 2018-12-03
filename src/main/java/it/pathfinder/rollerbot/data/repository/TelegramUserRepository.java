@@ -9,10 +9,10 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 @Repository
-public interface TelegramUserRepository extends ReactiveSortingRepository<TelegramUser, Long> {
+public interface TelegramUserRepository extends PagingAndSortingRepository<TelegramUser, Long> {
 
-    Mono<TelegramUser> findTelegramUserByTgId(Long tgId);
+    Optional<TelegramUser> findTelegramUserByTgId(Long tgId);
 
-    Mono<TelegramUser> findTelegramUserByTgUsername(String tgUsername);
+    Optional<TelegramUser> findTelegramUserByTgUsername(String tgUsername);
 
 }

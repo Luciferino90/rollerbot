@@ -13,6 +13,7 @@ import reactor.util.function.Tuples;
 
 import javax.persistence.Tuple;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -54,15 +55,17 @@ public class PathfinderPgService {
     }
 
     private Mono<PathfinderPg> save(PathfinderPg pathfinderPg) {
-        return pathfinderPgRepository.save(pathfinderPg);
+        return Mono.just(pathfinderPgRepository.save(pathfinderPg));
     }
 
     public Mono<PathfinderPg> findByOid(Long oid) {
-        return pathfinderPgRepository.findById(oid).switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by id " + oid)));
+        return Mono.just(Objects.requireNonNull(pathfinderPgRepository.findById(oid).orElse(null)))
+                .switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by id " + oid)));
     }
 
     public Mono<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser) {
-        return pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser).switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by name " + name)));
+        return Mono.just(Objects.requireNonNull(pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser).orElse(null)))
+                .switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by name " + name)));
     }
 
     public Mono<PathfinderPg> delete(String name, TelegramUser telegramUser) {
@@ -90,7 +93,7 @@ public class PathfinderPgService {
     }
 
     public Flux<PathfinderPg> list(TelegramUser telegramUser) {
-        return pathfinderPgRepository.findAllByTelegramUser(telegramUser);
+        return Flux.fromIterable(pathfinderPgRepository.findAllByTelegramUser(telegramUser));
     }
 
 }

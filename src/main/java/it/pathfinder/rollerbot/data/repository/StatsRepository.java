@@ -7,11 +7,12 @@ import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StatsRepository extends ReactiveSortingRepository<Stats, Long> {
+public interface StatsRepository extends PagingAndSortingRepository<Stats, Long> {
 
-    Mono<Stats> findAllByPathfinderPg(PathfinderPg pathfinderPg);
+    Optional<Stats> findAllByPathfinderPg(PathfinderPg pathfinderPg);
 
 }

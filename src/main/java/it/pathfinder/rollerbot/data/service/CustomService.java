@@ -26,7 +26,7 @@ public class CustomService {
     private TelegramUserService telegramUserService;
 
     public Mono<Custom> findByUserAndCustomNameAndPathfinderPg(TelegramUser telegramUser, String customName, PathfinderPg pathfinderPg) {
-        return customRepository.findByCustomNameAndTelegramUserAndPathfinderPg(customName, telegramUser, pathfinderPg)
+        return Mono.just(Objects.requireNonNull(customRepository.findByCustomNameAndTelegramUserAndPathfinderPg(customName, telegramUser, pathfinderPg).orElse(null)))
                 .switchIfEmpty(Mono.error(new TelegramUserException("Custom not found for " + customName+ " and " + telegramUser.getDefaultPathfinderPg().getName())));
     }
 
@@ -34,13 +34,13 @@ public class CustomService {
         return telegramUserService.findByTgOid(tgOid)
             .map(telegramUser -> Tuples.of(telegramUser, findByUserAndCustomNameAndPathfinderPg(telegramUser, customName, telegramUser.getDefaultPathfinderPg())))
             .flatMap(tuple2 -> tuple2.getT2()
-                    .switchIfEmpty(customRepository.save(
+                    .switchIfEmpty(Mono.just(customRepository.save(
                             Custom.builder()
                                     .telegramUser(tuple2.getT1())
                                     .pathfinderPg(tuple2.getT1().getDefaultPathfinderPg())
                                     .customName(customName)
                                     .customValue(customValue)
-                                    .build()))
+                                    .build())))
             );
     }
 
@@ -53,7 +53,7 @@ public class CustomService {
                         custom.setCustomValue(customValue);
                         return custom;
                     })
-                    .flatMap(custom -> customRepository.save(custom));
+                    .flatMap(custom -> Mono.just(customRepository.save(custom)));
     }
 
     public Mono<Custom> delete(Custom custom) {
@@ -75,11 +75,11 @@ public class CustomService {
         return telegramUserService.findByTgOid(tgOid)
                 .map(telegramUser -> customRepository.findByTelegramUser(telegramUser))
                 .switchIfEmpty(Mono.error(new CustomException("No custom command found for user " + tgOid)))
-                .flatMapMany(customFlux -> customFlux);
+                .flatMapMany(customs -> Flux.fromStream(customs.stream()));
     }
 
     public Flux<Custom> findByPathfinderPg(PathfinderPg pathfinderPg) {
-        return customRepository.findByPathfinderPg(pathfinderPg);
+        return Flux.fromStream(customRepository.findByPathfinderPg(pathfinderPg).stream());
     }
 
 }

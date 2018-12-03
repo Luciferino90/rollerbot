@@ -10,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -19,12 +20,12 @@ public class DefaultService {
     private DefaultRepository defaultRepository;
 
     public Mono<Default> get(String name) {
-        return defaultRepository.findDefaultByName(name)
+        return Mono.just(Objects.requireNonNull(defaultRepository.findDefaultByName(name).orElse(null)))
                 .switchIfEmpty(Mono.error(new DefaultException("Default formula: " + name + " not found.")));
     }
 
     public Flux<Default> findAll() {
-        return defaultRepository.findAll()
+        return Flux.fromIterable(defaultRepository.findAll())
                 .switchIfEmpty(Flux.error(new DefaultException("No default found")));
     }
 

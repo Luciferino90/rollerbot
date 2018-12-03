@@ -3,6 +3,8 @@ package it.pathfinder.rollerbot.data.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dto.generic.GenericDTO;
 import lombok.*;
+import org.apache.commons.lang3.builder.HashCodeExclude;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,12 +31,14 @@ public class TelegramUser extends GenericDTO implements Serializable {
     private String email;
 
     @OneToOne
-    @JsonIgnore
+    @ToStringExclude
+    @HashCodeExclude
     @JoinColumn(name = "default_pathfinder_id")
     private PathfinderPg defaultPathfinderPg;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ToStringExclude
+    @HashCodeExclude
     private List<PathfinderPg> pathfinderPgList;
 
 }

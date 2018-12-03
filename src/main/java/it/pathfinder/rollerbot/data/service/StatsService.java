@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Service
 public class StatsService {
 
@@ -20,22 +22,23 @@ public class StatsService {
     private PathfinderPgService pathfinderPgService;
 
     public Mono<Stats> findByCharacter(PathfinderPg pathfinderPg) {
-        return statsRepository.findAllByPathfinderPg(pathfinderPg)
+        return Mono.just(Objects.requireNonNull(statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(null)))
                 .switchIfEmpty(Mono.error(new StatsException("No stats found for " + pathfinderPg.getName())));
     }
 
     public Flux<Stats> list(TelegramUser telegramUser) {
         return pathfinderPgService.list(telegramUser)
-                .flatMap(pathfinderPg -> statsRepository.findAllByPathfinderPg(pathfinderPg)
+                .flatMap(pathfinderPg -> Mono.just(Objects.requireNonNull(statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(null)))
                     .switchIfEmpty(Mono.error(new StatsException("No stats found for " + pathfinderPg.getName()))));
     }
 
     public Mono<Stats> save(Stats stats) {
-        return statsRepository.save(stats);
+        return Mono.just(statsRepository.save(stats));
     }
 
     public Mono<Stats> set(PathfinderPg pathfinderPg, String name, Integer value) {
-        return statsRepository.findAllByPathfinderPg(pathfinderPg).defaultIfEmpty(new Stats(pathfinderPg))
+        return Mono.just(Objects.requireNonNull(statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(null)))
+                .defaultIfEmpty(new Stats(pathfinderPg))
             .map(stat -> {
                 switch (name.toUpperCase()) {
                     case "HP":
@@ -89,11 +92,12 @@ public class StatsService {
                 }
                 return stat;
             })
-            .flatMap(stats -> statsRepository.save(stats));
+            .flatMap(stats -> Mono.just(statsRepository.save(stats)));
     }
 
     public Mono<Integer> get(PathfinderPg pathfinderPg, String name) {
-        return statsRepository.findAllByPathfinderPg(pathfinderPg).defaultIfEmpty(new Stats(pathfinderPg))
+        return Mono.just(Objects.requireNonNull(statsRepository.findAllByPathfinderPg(pathfinderPg).orElse(null)))
+                .defaultIfEmpty(new Stats(pathfinderPg))
                 .map(stat -> {
                     switch (name.toUpperCase()) {
                         case "HP":

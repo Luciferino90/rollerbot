@@ -14,14 +14,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CustomRepository extends ReactiveSortingRepository<Custom, Long> {
+public interface CustomRepository extends PagingAndSortingRepository<Custom, Long> {
 
-    Mono<Custom> findByCustomNameAndTelegramUser(String customName, TelegramUser telegramUser);
+    Optional<Custom> findByCustomNameAndTelegramUser(String customName, TelegramUser telegramUser);
 
-    Mono<Custom> findByCustomNameAndTelegramUserAndPathfinderPg(String customName, TelegramUser telegramUser,
+    Optional<Custom> findByCustomNameAndTelegramUserAndPathfinderPg(String customName, TelegramUser telegramUser,
                                                                 PathfinderPg pathfinderPg);
 
-    Flux<Custom> findByTelegramUser(TelegramUser telegramUser);
+    List<Custom> findByTelegramUser(TelegramUser telegramUser);
 
-    Flux<Custom> findByPathfinderPg(PathfinderPg pathfinderPg);
+    List<Custom> findByPathfinderPg(PathfinderPg pathfinderPg);
+
 }

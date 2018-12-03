@@ -10,8 +10,8 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 @Repository
-public interface DefaultRepository extends ReactiveSortingRepository<Default, Long> {
+public interface DefaultRepository extends PagingAndSortingRepository<Default, Long> {
 
-    Mono<Default> findDefaultByName(String name);
+    Optional<Default> findDefaultByName(String name);
 
 }

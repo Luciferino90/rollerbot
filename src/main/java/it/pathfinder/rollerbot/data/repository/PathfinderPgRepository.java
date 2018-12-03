@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PathfinderPgRepository extends ReactiveSortingRepository<PathfinderPg, Long> {
+public interface PathfinderPgRepository extends PagingAndSortingRepository<PathfinderPg, Long> {
 
-    Mono<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser);
+    Optional<PathfinderPg> findByNameAndTelegramUser(String name, TelegramUser telegramUser);
 
-    Flux<PathfinderPg> findAllByTelegramUser(TelegramUser telegramUser);
+    List<PathfinderPg> findAllByTelegramUser(TelegramUser telegramUser);
 
 }
