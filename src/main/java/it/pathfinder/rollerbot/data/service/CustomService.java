@@ -15,6 +15,7 @@ import reactor.util.function.Tuples;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class CustomService {
@@ -78,8 +79,8 @@ public class CustomService {
                 .flatMapMany(customs -> Flux.fromStream(customs.stream()));
     }
 
-    public Flux<Custom> findByPathfinderPg(PathfinderPg pathfinderPg) {
-        return Flux.fromStream(customRepository.findByPathfinderPg(pathfinderPg).stream());
+    public Stream<Custom> findByPathfinderPg(PathfinderPg pathfinderPg) {
+        return customRepository.findByPathfinderPg(pathfinderPg).stream();
     }
 
 }

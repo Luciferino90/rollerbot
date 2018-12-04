@@ -52,6 +52,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .uri(prepareUri(message.getText()) + queryParam)
                     .retrieve()
                     .bodyToMono(GenericResponse.class)
+                    .log()
                     .block();
             String prettyResponse = response.getData().toString();
             sendMessage(prettyResponse, message.getMessageId(), message.getChatId());

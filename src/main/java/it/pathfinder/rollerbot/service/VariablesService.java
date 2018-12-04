@@ -12,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 public class VariablesService {
@@ -58,7 +58,7 @@ public class VariablesService {
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        List<String> customList = customService.findByPathfinderPg(telegramUser.getDefaultPathfinderPg()).toStream()
+        List<String> customList = customService.findByPathfinderPg(telegramUser.getDefaultPathfinderPg())
                 .map(Custom::getCustomName)
                 .collect(Collectors.toList());
 
@@ -68,7 +68,7 @@ public class VariablesService {
                         statsList.stream(),
                         customList.stream()
                 )
-        ).sorted((a, b) -> Integer.compare(b.length(), a.length()))
+            ).sorted((a, b) -> Integer.compare(b.length(), a.length()))
                 .collect(Collectors.toList());
 
         int count = 0;
