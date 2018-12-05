@@ -1,8 +1,6 @@
 package it.pathfinder.rollerbot.webflux.controller;
 
 import dto.generic.GenericDTO;
-import dto.request.custom.Request;
-import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.service.VariablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

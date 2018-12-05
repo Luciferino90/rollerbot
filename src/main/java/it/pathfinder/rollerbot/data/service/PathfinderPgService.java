@@ -1,7 +1,6 @@
 package it.pathfinder.rollerbot.data.service;
 
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
-import it.pathfinder.rollerbot.data.entity.Stats;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.PathfinderPgRepository;
 import it.pathfinder.rollerbot.exception.PathfinderPgException;
@@ -9,12 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
-import javax.persistence.Tuple;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class PathfinderPgService {

@@ -1,6 +1,5 @@
 package it.pathfinder.rollerbot.telegram;
 
-import dto.generic.GenericDTO;
 import dto.response.generic.GenericResponse;
 import dto.response.generic.ResponseList;
 import it.pathfinder.rollerbot.config.ConfigBean;
@@ -24,7 +23,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

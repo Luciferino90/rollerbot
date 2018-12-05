@@ -1,11 +1,9 @@
 package it.pathfinder.rollerbot.webflux.controller;
 
-import dto.request.custom.Request;
 import it.pathfinder.rollerbot.data.service.*;
 import it.pathfinder.rollerbot.service.ParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.reactive.function.server.ServerRequest;
 
 @Controller
 public class BasicController {

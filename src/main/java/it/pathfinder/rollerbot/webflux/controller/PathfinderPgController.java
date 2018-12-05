@@ -3,18 +3,13 @@ package it.pathfinder.rollerbot.webflux.controller;
 import dto.generic.GenericDTO;
 import dto.generic.entity.PathfinderPgDetail;
 import dto.request.custom.Request;
-import dto.response.generic.ResponseList;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.exception.PathfinderPgException;
-import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
-
-import java.util.stream.Collectors;
 
 @Controller
 public class PathfinderPgController extends BasicController implements DaoController {

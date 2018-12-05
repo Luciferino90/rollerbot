@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TelegramUserService {

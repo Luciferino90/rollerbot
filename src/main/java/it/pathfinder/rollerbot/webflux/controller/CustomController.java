@@ -3,14 +3,9 @@ package it.pathfinder.rollerbot.webflux.controller;
 import dto.generic.GenericDTO;
 import dto.generic.entity.CustomDetail;
 import dto.request.custom.Request;
-import dto.response.generic.ResponseList;
-import it.pathfinder.rollerbot.exception.CustomException;
-import it.pathfinder.rollerbot.exception.TelegramUserException;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.stream.Collectors;
 
 @Controller
 public class CustomController extends BasicController implements DaoController {

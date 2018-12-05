@@ -3,8 +3,6 @@ package it.pathfinder.rollerbot.data.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dto.generic.GenericDTO;
 import lombok.*;
-import org.apache.commons.lang3.builder.HashCodeExclude;
-import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.persistence.*;
 import java.io.Serializable;

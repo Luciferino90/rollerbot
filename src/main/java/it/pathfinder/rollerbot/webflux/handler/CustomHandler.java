@@ -1,6 +1,5 @@
 package it.pathfinder.rollerbot.webflux.handler;
 
-import dto.request.custom.Request;
 import dto.response.generic.GenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
