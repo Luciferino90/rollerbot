@@ -1,9 +1,6 @@
 package it.pathfinder.rollerbot.data.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +19,7 @@ public class PathfinderPg implements Serializable {
     private String name;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "telegram_user_id")
     private TelegramUser telegramUser;
 

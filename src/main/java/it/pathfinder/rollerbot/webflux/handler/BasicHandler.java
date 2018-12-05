@@ -1,14 +1,10 @@
 package it.pathfinder.rollerbot.webflux.handler;
 
-import dto.generic.GenericDTO;
-import dto.response.generic.GenericResponse;
+import dto.request.custom.Request;
 import it.pathfinder.rollerbot.webflux.controller.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.server.ServerRequest;
 
 @Component
 public abstract class BasicHandler {
@@ -28,22 +24,13 @@ public abstract class BasicHandler {
     @Autowired
     GenericController genericController;
 
-    Mono responseT(GenericDTO data) {
-        return Mono.just(new GenericResponse(data));
+    protected Request readRequest(ServerRequest serverRequest) {
+        return Request.builder()
+                .tgOid(Long.parseLong(serverRequest.queryParam("tgOid").orElse("")))
+                .name(serverRequest.pathVariables().containsKey("name") ? serverRequest.pathVariable("name") : null)
+                .value(serverRequest.pathVariables().containsKey("value") ? serverRequest.pathVariable("value") : null)
+                .build();
     }
 
-    Mono<ServerResponse> response(GenericDTO data) {
-        GenericResponse response = new GenericResponse();
-        response.setData(data);
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromPublisher(Mono.just(response), GenericResponse.class));
-    }
-
-    Mono<ServerResponse> response(String plainText) {
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(plainText));
-    }
 
 }

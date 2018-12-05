@@ -21,11 +21,29 @@ public class PathfinderPgController extends BasicController implements DaoContro
 
     private Logger logger = LoggerFactory.getLogger(BasicController.class);
 
+    /**
+     *         Request request = readRequest(serverRequest);
+     *         Optional<TelegramUser> telegramUser = telegramUserService.findByTgOid(request.getTgOid());
+     *
+     *         if (telegramUser.isPresent()) {
+     *             PathfinderPg pathfinderPg = pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser.get());
+     *             if (pathfinderPg != null)
+     *                 return new Error("Character already created");
+     *             return new PathfinderPgDetail(pathfinderPgService.set(request.getName(), telegramUser.get()));
+     *         } else {
+     *             return new Error("Telegram User not registered");
+     *         }
+     *     }
+     * @param request
+     * @return
+     */
     @Override
     public Mono<GenericDTO> set(Request request) {
         return telegramUserService.findByTgOid(request.getTgOid())
-                .flatMap(telegramUser -> pathfinderPgService.findByNameAndTelegramUser(request.getName(), telegramUser))
-                .map(PathfinderPgDetail::new);
+                .flatMap(telegramUser ->
+                        (pathfinderPgService.findByNameAndTelegramUserOrEmpty(request.getName(), telegramUser)
+                            .switchIfEmpty(pathfinderPgService.set(request.getName(), telegramUser)))
+                        .map(PathfinderPgDetail::new));
     }
 
     @Override

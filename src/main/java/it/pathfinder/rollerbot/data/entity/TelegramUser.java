@@ -39,6 +39,7 @@ public class TelegramUser extends GenericDTO implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY)
     @ToString.Exclude
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private List<PathfinderPg> pathfinderPgList;
 

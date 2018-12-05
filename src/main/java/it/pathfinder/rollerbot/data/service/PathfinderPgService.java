@@ -68,6 +68,10 @@ public class PathfinderPgService {
                 .switchIfEmpty(Mono.error(new PathfinderPgException("No pathfinder character by name " + name)));
     }
 
+    public Mono<PathfinderPg> findByNameAndTelegramUserOrEmpty(String name, TelegramUser telegramUser) {
+        return Mono.justOrEmpty(pathfinderPgRepository.findByNameAndTelegramUser(name, telegramUser));
+    }
+
     public Mono<PathfinderPg> delete(String name, TelegramUser telegramUser) {
         return findByNameAndTelegramUser(name, telegramUser)
                 .map(pathfinderPg -> {

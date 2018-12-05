@@ -1,6 +1,8 @@
 package it.pathfinder.rollerbot.telegram;
 
+import dto.generic.GenericDTO;
 import dto.response.generic.GenericResponse;
+import dto.response.generic.ResponseList;
 import it.pathfinder.rollerbot.config.ConfigBean;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.service.TelegramUserService;
@@ -22,6 +24,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -48,12 +51,22 @@ public class TelegramBot extends TelegramLongPollingBot {
         TelegramUser telegramUser = telegramUserService.registerUser(message.getFrom()).block();
         String queryParam = "?tgOid=" + telegramUser.getTgId();
         try {
-            GenericResponse response = webClient.get()
+            GenericResponse response = new GenericResponse();
+
+            WebClient.ResponseSpec responseSpec = webClient.get()
                     .uri(prepareUri(message.getText()) + queryParam)
-                    .retrieve()
-                    .bodyToMono(GenericResponse.class)
-                    .log()
-                    .block();
+                    .retrieve();
+
+            try {
+                response = responseSpec.bodyToMono(GenericResponse.class).block();
+            } catch (Exception ex) {
+                response = new GenericResponse(new ResponseList(responseSpec
+                        .bodyToFlux(GenericResponse.class)
+                        .toStream()
+                        .map(GenericResponse::getData)
+                        .collect(Collectors.toList())));
+            }
+
             String prettyResponse = response.getData().toString();
             sendMessage(prettyResponse, message.getMessageId(), message.getChatId());
         } catch (Exception e) {
