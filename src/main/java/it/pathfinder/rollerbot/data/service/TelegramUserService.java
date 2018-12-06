@@ -1,6 +1,7 @@
 package it.pathfinder.rollerbot.data.service;
 
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
+import it.pathfinder.rollerbot.data.entity.Stats;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.TelegramUserRepository;
 import it.pathfinder.rollerbot.exception.TelegramUserException;

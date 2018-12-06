@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.telegram.telegrambots.ApiContextInitializer;
+import reactor.core.publisher.Hooks;
 
 @EnableWebFlux
 @SpringBootApplication
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 public class RollerBot {
 
     public static void main(String[] args) {
+        Hooks.onOperatorDebug();
         ApiContextInitializer.init();
         SpringApplication.run(RollerBot.class, args);
     }

@@ -1,6 +1,7 @@
 package it.pathfinder.rollerbot.data.service;
 
 import it.pathfinder.rollerbot.data.entity.PathfinderPg;
+import it.pathfinder.rollerbot.data.entity.Stats;
 import it.pathfinder.rollerbot.data.entity.TelegramUser;
 import it.pathfinder.rollerbot.data.repository.PathfinderPgRepository;
 import it.pathfinder.rollerbot.exception.PathfinderPgException;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.util.Objects;
 
@@ -50,7 +53,9 @@ public class PathfinderPgService {
     }
 
     private Mono<PathfinderPg> save(PathfinderPg pathfinderPg) {
-        return Mono.just(pathfinderPgRepository.save(pathfinderPg));
+        return Mono.just(pathfinderPgRepository.save(pathfinderPg))
+                .map(pathfinderPgSaved -> Tuples.of(pathfinderPgSaved, statsService.save(new Stats(pathfinderPgSaved))))
+                .map(Tuple2::getT1);
     }
 
     public Mono<PathfinderPg> findByOid(Long oid) {
